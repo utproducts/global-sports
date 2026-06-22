@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import { regionByKey, findCountry, PRESENCE } from "@/lib/countries";
 import { supabase } from "@/lib/supabase";
 
+export const runtime = "edge";
+
 type Stats = { teams: number; tournaments: number; venues: number };
 
 // Pull live counts for the country; fall back to static PRESENCE if Supabase isn't reachable.

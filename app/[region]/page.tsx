@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { regionByKey, PRESENCE } from "@/lib/countries";
 
+export const runtime = "edge";
+
 export default async function RegionPage({ params }: { params: Promise<{ region: string }> }) {
   const { region: regionKey } = await params;
   const region = regionByKey(regionKey);
