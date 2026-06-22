@@ -2,18 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CountryNav from "@/components/CountryNav";
 import { regionByKey, findCountry, PRESENCE } from "@/lib/countries";
 import { supabase } from "@/lib/supabase";
 
 export const runtime = "edge";
 
 type EventRow = {
+  slug: string | null;
   name: string;
   start_date: string | null;
   end_date: string | null;
   status: string | null;
   venue_city: string | null;
   registered_teams: number | null;
+  max_teams: number | null;
 };
 type TeamRow = { name: string; city: string | null; current_class: string | null };
 
@@ -42,7 +45,7 @@ async function getCountryData(code: string) {
     const [{ data: events }, teamsRes] = await Promise.all([
       supabase
         .from("tournament_summary")
-        .select("name,start_date,end_date,status,venue_city,registered_teams")
+        .select("slug,name,start_date,end_date,status,venue_city,registered_teams,max_teams")
         .eq("country_code", code)
         .order("start_date", { ascending: true }),
       country
@@ -80,6 +83,7 @@ export default async function CountryPage({
   return (
     <>
       <Header />
+      <CountryNav region={region.key} code={c.c} name={c.n} flag={c.f} active="overview" />
       <main>
         <section className="country-hero">
           <div className="wrap">
@@ -107,18 +111,24 @@ export default async function CountryPage({
               <p style={{ color: "var(--muted)" }}>No events scheduled yet — check back soon, or follow {region.label} for announcements.</p>
             ) : (
               <div className="grid" style={{ gridTemplateColumns: "1fr" }}>
-                {events.map((e, i) => (
-                  <div key={i} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
-                    <div>
-                      <h3 style={{ marginBottom: 4 }}>{e.name}</h3>
-                      <p>{fmtDate(e.start_date)}{e.end_date ? ` – ${fmtDate(e.end_date)}` : ""}{e.venue_city ? ` · ${e.venue_city}` : ""}{e.registered_teams ? ` · ${e.registered_teams} teams` : ""}</p>
+                {events.map((e, i) => {
+                  const evBase = `/${region.key}/${c.c.toLowerCase()}/events/${e.slug}`;
+                  const open = e.status === "registration_open";
+                  return (
+                    <div key={i} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
+                      <div>
+                        <h3 style={{ marginBottom: 4 }}>
+                          {e.slug ? <Link href={evBase} style={{ color: "var(--navy)" }}>{e.name}</Link> : e.name}
+                        </h3>
+                        <p>{fmtDate(e.start_date)}{e.end_date ? ` – ${fmtDate(e.end_date)}` : ""}{e.venue_city ? ` · ${e.venue_city}` : ""}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        {e.status && <span className="chip" style={{ background: open ? "#e1f8ea" : "#eef1f6", color: open ? "#138a45" : "#5b6675", border: "none" }}>{STATUS_LABEL[e.status] ?? e.status}</span>}
+                        {e.slug && <Link className="btn btn-dark" href={open ? `${evBase}/register` : evBase} style={{ padding: "9px 16px" }}>{open ? "Register" : "Details"}</Link>}
+                      </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      {e.status && <span className="chip" style={{ background: e.status === "registration_open" ? "#e1f8ea" : "#eef1f6", color: e.status === "registration_open" ? "#138a45" : "#5b6675", border: "none" }}>{STATUS_LABEL[e.status] ?? e.status}</span>}
-                      <Link className="btn btn-dark" href="/login" style={{ padding: "9px 16px" }}>Register</Link>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
