@@ -23,27 +23,6 @@ export default function WorldMap() {
     (async () => {
       // Determine which countries we operate in — LIVE from the database
       // (any country with teams or events). Falls back to the static snapshot.
-      const active = new Set<string>(Object.keys(PRESENCE));
-      try {
-        if (supabase) {
-          const [teamsRes, eventsRes] = await Promise.all([
-            supabase.from("teams").select("countries(code)"),
-            supabase.from("tournament_summary").select("country_code"),
-          ]);
-          const live = new Set<string>();
-          (teamsRes.data as { countries?: { code?: string } }[] | null)?.forEach((r) => {
-            const code = r.countries?.code;
-            if (code) live.add(code);
-          });
-          (eventsRes.data as { country_code?: string }[] | null)?.forEach((r) => {
-            if (r.country_code) live.add(r.country_code);
-          });
-          if (live.size) { active.clear(); live.forEach((c) => active.add(c)); }
-        }
-      } catch {
-        /* keep static fallback */
-      }
-
       const mod = await import("jsvectormap");
       const JsVectorMap = mod.default;
       // world map data registers itself onto the JsVectorMap global
@@ -52,11 +31,15 @@ export default function WorldMap() {
       if (cancelled || !mapEl.current) return;
 
       // jsvectormap series colors values through an ordinal SCALE (category -> color).
-      const regionValues: Record<string, string> = {};
-      for (const r of REGIONS)
-        for (const c of r.countries)
-          regionValues[c.c] = active.has(c.c) ? "active" : "inProgram";
+      const buildValues = (activeSet: Set<string>) => {
+        const v: Record<string, string> = {};
+        for (const r of REGIONS)
+          for (const c of r.countries)
+            v[c.c] = activeSet.has(c.c) ? "active" : "inProgram";
+        return v;
+      };
 
+      // 1) Paint immediately from the known operating set — reliable, no waiting.
       map = new JsVectorMap({
         selector: mapEl.current,
         map: "world",
@@ -72,7 +55,7 @@ export default function WorldMap() {
             {
               attribute: "fill",
               scale: { active: "#f5c518", inProgram: "#3a5fa0" },
-              values: regionValues,
+              values: buildValues(new Set(Object.keys(PRESENCE))),
             },
           ],
         },
@@ -89,6 +72,30 @@ export default function WorldMap() {
           if (info) go(info);
         },
       });
+
+      // 2) Enhance with LIVE data (countries with teams/events) — non-blocking.
+      if (supabase) {
+        (async () => {
+          try {
+            const [teamsRes, eventsRes] = await Promise.all([
+              supabase.from("teams").select("countries(code)"),
+              supabase.from("tournament_summary").select("country_code"),
+            ]);
+            const live = new Set<string>();
+            (teamsRes.data as { countries?: { code?: string } }[] | null)?.forEach((r) => {
+              if (r.countries?.code) live.add(r.countries.code);
+            });
+            (eventsRes.data as { country_code?: string }[] | null)?.forEach((r) => {
+              if (r.country_code) live.add(r.country_code);
+            });
+            if (live.size && map && !cancelled) {
+              map.series.regions[0].setValues(buildValues(live));
+            }
+          } catch {
+            /* keep the immediate static coloring */
+          }
+        })();
+      }
     })();
 
     return () => {
