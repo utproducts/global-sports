@@ -45,7 +45,7 @@ export default function LoginPage() {
             {loading ? "Signing in…" : "Log in"}
           </button>
         </form>
-        <p className="auth-foot">Don&apos;t have a membership yet? <Link href="/#map">Pick your country</Link> to get started.</p>
+        <p className="auth-foot">Don&apos;t have an account yet? <Link href="/signup">Sign up</Link></p>
       </div>
     </main>
   );
