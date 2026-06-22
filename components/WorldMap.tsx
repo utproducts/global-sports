@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { REGIONS, PRESENCE, byCode, ALL_COUNTRIES, type CountryEntry } from "@/lib/countries";
+import { supabase } from "@/lib/supabase";
 import "jsvectormap/dist/jsvectormap.min.css";
 
 export default function WorldMap() {
@@ -20,6 +21,29 @@ export default function WorldMap() {
     let cancelled = false;
 
     (async () => {
+      // Determine which countries we operate in — LIVE from the database
+      // (any country with teams or events). Falls back to the static snapshot.
+      const active = new Set<string>(Object.keys(PRESENCE));
+      try {
+        if (supabase) {
+          const [teamsRes, eventsRes] = await Promise.all([
+            supabase.from("teams").select("countries(code)"),
+            supabase.from("tournament_summary").select("country_code"),
+          ]);
+          const live = new Set<string>();
+          (teamsRes.data as { countries?: { code?: string } }[] | null)?.forEach((r) => {
+            const code = r.countries?.code;
+            if (code) live.add(code);
+          });
+          (eventsRes.data as { country_code?: string }[] | null)?.forEach((r) => {
+            if (r.country_code) live.add(r.country_code);
+          });
+          if (live.size) { active.clear(); live.forEach((c) => active.add(c)); }
+        }
+      } catch {
+        /* keep static fallback */
+      }
+
       const mod = await import("jsvectormap");
       const JsVectorMap = mod.default;
       // world map data registers itself onto the JsVectorMap global
@@ -31,7 +55,7 @@ export default function WorldMap() {
       const regionValues: Record<string, string> = {};
       for (const r of REGIONS)
         for (const c of r.countries)
-          regionValues[c.c] = PRESENCE[c.c] ? "active" : "inProgram";
+          regionValues[c.c] = active.has(c.c) ? "active" : "inProgram";
 
       map = new JsVectorMap({
         selector: mapEl.current,
