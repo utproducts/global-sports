@@ -46,6 +46,15 @@ export const REGIONS: Region[] = [
   },
 ];
 
+// VAT rate per country (from the countries table). Used for membership pricing.
+export const VAT: Record<string, number> = {
+  AE: 0.05, AT: 0.20, BE: 0.21, BG: 0.20, CA: 0.13, CH: 0.077, CW: 0.06, CY: 0.19,
+  CZ: 0.21, DE: 0.19, DK: 0.25, DO: 0.18, EE: 0.22, ES: 0.21, FI: 0.255, FR: 0.20,
+  GB: 0.20, GG: 0.0, GR: 0.24, HR: 0.25, HU: 0.27, ID: 0.11, IE: 0.23, IT: 0.22,
+  LT: 0.21, LU: 0.17, LV: 0.21, MT: 0.18, NL: 0.21, NO: 0.25, PL: 0.23, PT: 0.23,
+  RO: 0.19, RS: 0.20, SA: 0.15, SE: 0.25, SI: 0.22, SK: 0.20, US: 0.0, XI: 0.20,
+};
+
 // Countries where we currently have a presence (teams / venues / events).
 export const PRESENCE: Record<string, { teams: number; venues?: number; tournaments?: number }> = {
   US: { teams: 14 }, NL: { teams: 10 }, ES: { teams: 9, venues: 5, tournaments: 1 }, GB: { teams: 9 },

@@ -93,7 +93,7 @@ export default async function CountryPage({
               <span className="chip">{events.length} event{events.length === 1 ? "" : "s"}</span>
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 22, flexWrap: "wrap" }}>
-              <Link className="btn btn-primary" href="/signup">Create your membership</Link>
+              <Link className="btn btn-primary" href={`/membership?country=${c.c}`}>Create your membership</Link>
               <Link className="btn btn-ghost" href="/login">Log in</Link>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default async function CountryPage({
               <span className="mem-note">🔔 Billed in {c.cur} + local VAT · valid in every Global Sports country</span>
             </div>
             <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-              <Link className="btn btn-primary" href="/signup">Create membership</Link>
+              <Link className="btn btn-primary" href={`/membership?country=${c.c}`}>Create membership</Link>
               <Link className="btn btn-dark" href={`/${region.key}`}>Back to {region.label}</Link>
             </div>
           </div>

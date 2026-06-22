@@ -15,7 +15,7 @@ export default function Header() {
         <nav className="nav-links">
           <Link href="/#why">Why us</Link>
           <Link href="/#how">How it works</Link>
-          <Link href="/#membership">Membership</Link>
+          <Link href="/membership">Membership</Link>
           <Link href="/login">Log in</Link>
           <CountrySwitcher />
         </nav>

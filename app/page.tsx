@@ -68,6 +68,9 @@ export default function Home() {
               <div className="tier"><h3>Elite</h3><div className="price">€75<span>/yr</span></div><div className="cur">Charged in your local currency + VAT</div>
                 <ul><li>Everything in Select</li><li>Premium membership card</li><li>Early access to championships</li></ul></div>
             </div>
+            <div style={{ textAlign: "center", marginTop: 30 }}>
+              <a href="/membership" className="btn btn-primary">Choose your membership →</a>
+            </div>
           </div>
         </section>
       </main>
