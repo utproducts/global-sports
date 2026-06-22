@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { HIERARCHY, tierForRole, type Tier } from "@/lib/roles";
+import CountrySwitcher from "@/components/CountrySwitcher";
 
 type Profile = { first_name?: string; last_name?: string; role?: string; email?: string };
 type Scope = { role: string; scope_type: string; scope_value: string | null };
@@ -65,6 +66,7 @@ export default function Dashboard() {
             <div className="name">GLOBAL SPORTS<small>DASHBOARD</small></div>
           </Link>
           <nav className="nav-links">
+            <CountrySwitcher />
             <button className="btn btn-dark" onClick={signOut}>Sign out</button>
           </nav>
         </div>

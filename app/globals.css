@@ -146,3 +146,24 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 .auth-error{background:#fdecec;color:#b3261e;font-size:13px;font-weight:600;padding:10px 12px;border-radius:9px}
 .auth-foot{text-align:center;font-size:13px;color:var(--muted);margin-top:18px}
 .auth-foot a{color:var(--navy);font-weight:700}
+
+/* COUNTRY SWITCHER */
+.cswitch{position:relative;display:inline-block}
+.cswitch-btn{display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:#fff;border:none;border-radius:999px;padding:11px 18px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s}
+.cswitch-btn:hover{background:var(--navy-2)}
+.cswitch-btn .cs-caret{font-size:11px;opacity:.8}
+.cswitch-backdrop{position:fixed;inset:0;z-index:90}
+.cswitch-panel{position:absolute;top:calc(100% + 10px);right:0;width:340px;max-width:90vw;background:#fff;color:var(--ink);border-radius:14px;box-shadow:0 20px 60px rgba(10,22,40,.28);z-index:100;overflow:hidden}
+.cswitch-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cswitch-title{font-size:14px;font-weight:800}
+.cswitch-x{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer}
+.cswitch-search{width:calc(100% - 24px);margin:12px;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14px;font-family:inherit;outline:none}
+.cswitch-search:focus{border-color:var(--navy)}
+.cswitch-list{max-height:340px;overflow-y:auto;padding-bottom:8px}
+.cswitch-region{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 16px 4px;position:sticky;top:0;background:#fff}
+.cswitch-row{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:none;padding:9px 16px;font-size:14px;font-weight:600;font-family:inherit;color:var(--ink);cursor:pointer}
+.cswitch-row:hover{background:var(--bg)}
+.csr-flag{font-size:18px;line-height:1}
+.csr-name{flex:1}
+.csr-dot{width:8px;height:8px;border-radius:999px;background:var(--gold);margin-left:auto}
+.cswitch-empty{padding:18px 16px;color:var(--muted);font-size:13px}

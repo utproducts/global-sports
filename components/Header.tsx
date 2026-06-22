@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CountrySwitcher from "./CountrySwitcher";
 
 export default function Header() {
   return (
@@ -16,7 +17,7 @@ export default function Header() {
           <Link href="/#how">How it works</Link>
           <Link href="/#membership">Membership</Link>
           <Link href="/login">Log in</Link>
-          <Link href="/#map" className="btn btn-dark">Select country</Link>
+          <CountrySwitcher />
         </nav>
       </div>
     </header>
