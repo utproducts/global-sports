@@ -139,8 +139,9 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 .auth-card h1{font-size:24px;font-weight:900;text-align:center}
 .auth-sub{text-align:center;color:var(--muted);font-size:14px;margin:6px 0 22px}
 .auth-card form{display:flex;flex-direction:column;gap:14px}
-.auth-card label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#33404f}
-.auth-card input{padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;outline:none}
+.auth-card label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#33404f;min-width:0}
+.auth-card input{width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;outline:none}
+.auth-card form > div{min-width:0}
 .auth-card input:focus{border-color:var(--navy)}
 .auth-card .btn{width:100%;justify-content:center;margin-top:4px}
 .auth-error{background:#fdecec;color:#b3261e;font-size:13px;font-weight:600;padding:10px 12px;border-radius:9px}
