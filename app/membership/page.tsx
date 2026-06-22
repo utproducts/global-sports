@@ -32,8 +32,7 @@ export default function MembershipPage() {
   const money = (n: number) => `€${n.toFixed(2)}`;
 
   function onContinue() {
-    // Account is required before payment — carry the selection into sign-up/checkout.
-    router.push(`/signup?plan=${tier}&country=${country}`);
+    router.push(`/membership/checkout?plan=${tier}&country=${country}`);
   }
 
   return (

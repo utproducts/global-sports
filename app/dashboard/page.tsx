@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [scopes, setScopes] = useState<Scope[]>([]);
   const [tier, setTier] = useState<Tier>(HIERARCHY[HIERARCHY.length - 1]);
+  const [membership, setMembership] = useState<{ tier: string; status: string; expires_at: string | null } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -41,6 +42,15 @@ export default function Dashboard() {
             .eq("user_id", uid)
             .eq("is_active", true);
           if (dr) setScopes(dr as Scope[]);
+
+          const { data: mem } = await supabase
+            .from("ipr_memberships")
+            .select("tier,status,expires_at")
+            .eq("player_id", uid)
+            .order("activated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (mem) setMembership(mem as { tier: string; status: string; expires_at: string | null });
         }
       }
       setLoading(false);
@@ -78,6 +88,21 @@ export default function Dashboard() {
         <p style={{ color: "var(--muted)" }}>
           Your access level: <strong style={{ color: "var(--navy)" }}>{tier.label}</strong> — {tier.scope}.
         </p>
+
+        <div style={{ marginTop: 22, maxWidth: 640, borderRadius: 14, padding: "18px 22px", border: "1.5px solid var(--line)", background: membership && membership.status === "active" ? "#fff8df" : "#fff", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", color: "var(--muted)" }}>Global Sports Membership</div>
+            {membership ? (
+              <div style={{ fontWeight: 800, fontSize: 18, textTransform: "capitalize" }}>
+                {membership.tier} · <span style={{ color: membership.status === "active" ? "#138a45" : "#8a6300" }}>{membership.status}</span>
+                {membership.expires_at && <span style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)" }}> · renews {new Date(membership.expires_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>}
+              </div>
+            ) : (
+              <div style={{ fontWeight: 700, fontSize: 15, color: "var(--muted)" }}>No active membership</div>
+            )}
+          </div>
+          {!membership && <Link className="btn btn-primary" href="/membership">Get membership</Link>}
+        </div>
 
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: "34px 0 14px" }}>Access hierarchy</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 640 }}>
