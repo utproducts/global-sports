@@ -27,10 +27,11 @@ export default function WorldMap() {
       await import("jsvectormap/dist/maps/world.js");
       if (cancelled || !mapEl.current) return;
 
-      const regionFill: Record<string, string> = {};
+      // jsvectormap series colors values through an ordinal SCALE (category -> color).
+      const regionValues: Record<string, string> = {};
       for (const r of REGIONS)
         for (const c of r.countries)
-          regionFill[c.c] = PRESENCE[c.c] ? "#f5c518" : "#3a5fa0";
+          regionValues[c.c] = PRESENCE[c.c] ? "active" : "inProgram";
 
       map = new JsVectorMap({
         selector: mapEl.current,
@@ -42,7 +43,15 @@ export default function WorldMap() {
           initial: { fill: "#27406a", stroke: "#0a1628", strokeWidth: 0.4, fillOpacity: 1 },
           hover: { fill: "#ffd84a", fillOpacity: 1, cursor: "pointer" },
         },
-        series: { regions: [{ attribute: "fill", values: regionFill }] },
+        series: {
+          regions: [
+            {
+              attribute: "fill",
+              scale: { active: "#f5c518", inProgram: "#3a5fa0" },
+              values: regionValues,
+            },
+          ],
+        },
         onRegionTooltipShow(_e: any, tooltip: any, code: string) {
           const info = byCode[code];
           if (info) {

@@ -15,6 +15,7 @@ export default function Header() {
           <Link href="/#why">Why us</Link>
           <Link href="/#how">How it works</Link>
           <Link href="/#membership">Membership</Link>
+          <Link href="/login">Log in</Link>
           <Link href="/#map" className="btn btn-dark">Select country</Link>
         </nav>
       </div>

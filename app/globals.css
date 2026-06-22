@@ -130,3 +130,19 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 .cc-card .cn{font-size:14px;font-weight:700}
 .cc-card .cc{font-size:11px;color:var(--muted);font-weight:600}
 .cc-card .tag{margin-left:auto;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:999px;background:#fef3d6;color:#8a6300}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(1000px 500px at 50% -10%,#16315c 0,var(--navy) 60%);padding:24px}
+.auth-card{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);padding:36px;width:100%;max-width:400px}
+.auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:18px;color:var(--navy);font-weight:900;letter-spacing:.5px}
+.auth-brand img{height:34px;width:34px;object-fit:contain}
+.auth-card h1{font-size:24px;font-weight:900;text-align:center}
+.auth-sub{text-align:center;color:var(--muted);font-size:14px;margin:6px 0 22px}
+.auth-card form{display:flex;flex-direction:column;gap:14px}
+.auth-card label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:#33404f}
+.auth-card input{padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;outline:none}
+.auth-card input:focus{border-color:var(--navy)}
+.auth-card .btn{width:100%;justify-content:center;margin-top:4px}
+.auth-error{background:#fdecec;color:#b3261e;font-size:13px;font-weight:600;padding:10px 12px;border-radius:9px}
+.auth-foot{text-align:center;font-size:13px;color:var(--muted);margin-top:18px}
+.auth-foot a{color:var(--navy);font-weight:700}
