@@ -95,7 +95,7 @@ section.pad{padding:80px 0}
 @media(max-width:540px){.why{grid-template-columns:1fr}}
 .card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:.18s}
 .card:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:#d4dae4}
-.card .ic{width:46px;height:46px;border-radius:12px;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.card .ic{display:none}
 .card h3{font-size:17px;font-weight:800;margin-bottom:8px}
 .card p{color:var(--muted);font-size:14px}
 .steps-sec{background:var(--bg)}
@@ -143,7 +143,7 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 @media(max-width:760px){.shell-grid{grid-template-columns:1fr}}
 .shell-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px;display:flex;flex-direction:column;gap:10px;transition:.18s}
 .shell-card:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
-.shell-card .ic{font-size:26px}
+.shell-card .ic{display:none}
 .shell-card h3{font-size:19px;font-weight:800}
 .shell-card p{color:var(--muted);font-size:14px}
 .shell-card .soon{margin-top:6px;font-size:11px;font-weight:800;letter-spacing:.5px;color:#8a6300;background:#fff4e0;align-self:flex-start;padding:3px 9px;border-radius:999px}
