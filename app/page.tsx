@@ -1,6 +1,8 @@
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WorldMap from "@/components/WorldMap";
+import { REGIONS, PRESENCE } from "@/lib/countries";
 
 export default function Home() {
   return (
@@ -12,10 +14,22 @@ export default function Home() {
           <div className="wrap">
             <div className="hero-copy">
               <div className="eyebrow" style={{ color: "var(--gold)" }}>Adult Slow-Pitch · Worldwide</div>
-              <h1>Where do you play? <span className="accent">Pick your country.</span></h1>
-              <p>Tap your country on the map to enter — then scroll to see why one membership puts the whole world in play.</p>
+              <h1>Where do you play? <span className="accent">Pick your region.</span></h1>
+              <p>Tap your region on the map to zoom in and choose your country — then scroll to see why one membership puts the whole world in play.</p>
             </div>
             <WorldMap />
+            <div className="continent-tiles">
+              {REGIONS.map((r) => {
+                const active = r.countries.filter((c) => PRESENCE[c.c]).length;
+                return (
+                  <Link key={r.key} href={`/${r.key}`} className="ct">
+                    <span className="ct-flags">{r.countries.slice(0, 3).map((c) => c.f).join(" ")}</span>
+                    <span className="ct-name">{r.label}</span>
+                    <span className="ct-meta">{r.countries.length} countries{active ? ` · ${active} active` : ""}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
           <div className="scroll-cue">Scroll to learn more about Global Sports<span className="arrow">↓</span></div>
         </section>

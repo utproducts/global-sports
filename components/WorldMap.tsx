@@ -69,7 +69,7 @@ export default function WorldMap() {
         },
         onRegionClick(_e: any, code: string) {
           const info = byCode[code];
-          if (info) go(info);
+          if (info) router.push(`/${info.region.key}`); // continent page, then pick country there
         },
       });
 
@@ -120,7 +120,7 @@ export default function WorldMap() {
       <div className="map-tools">
         <div className="legend">
           <span><span className="dot data" /> We&apos;re active here</span>
-          <span><span className="dot live" /> Select to enter</span>
+          <span><span className="dot live" /> In our program</span>
         </div>
         <div className="csearch-wrap" onBlur={() => setTimeout(() => setOpen(false), 150)}>
           <span className="si">🔎</span>

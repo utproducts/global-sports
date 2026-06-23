@@ -2,9 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ContinentMap from "@/components/ContinentMap";
 import { regionByKey, PRESENCE } from "@/lib/countries";
-
-export const runtime = "edge";
 
 export default async function RegionPage({ params }: { params: Promise<{ region: string }> }) {
   const { region: regionKey } = await params;
@@ -12,25 +11,31 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
   if (!region) notFound();
 
   const countries = [...region.countries].sort((a, b) => a.n.localeCompare(b.n));
+  const activeCount = region.countries.filter((c) => PRESENCE[c.c]).length;
 
   return (
     <>
       <Header />
       <main>
-        <section className="country-hero">
+        <section className="map-hero">
           <div className="wrap">
-            <Link className="back" href="/">← All regions</Link>
-            <h1>{region.label}</h1>
-            <p className="sub">Choose your country to see events, teams and membership — set up in your local currency.</p>
-            <div className="chips">
-              <span className="chip">{countries.length} countries</span>
-              <span className="chip gold">{region.subdomain}</span>
+            <div className="hero-copy">
+              <Link className="back" href="/" style={{ display: "inline-block", marginBottom: 10 }}>← All regions</Link>
+              <div className="eyebrow" style={{ color: "var(--gold)" }}>{region.label}</div>
+              <h1>Pick your country</h1>
+              <p>Tap your country on the {region.label} map to enter its site — or search below.</p>
             </div>
+            <ContinentMap regionKey={region.key} countries={region.countries} />
           </div>
         </section>
 
         <section className="pad">
           <div className="wrap">
+            <div className="sec-head">
+              <div className="eyebrow">All countries</div>
+              <h2 style={{ fontSize: 24 }}>{region.label} — {countries.length} countries</h2>
+              {activeCount > 0 && <p>{activeCount} with active teams or events.</p>}
+            </div>
             <div className="region-countries">
               {countries.map((c) => (
                 <Link key={c.c} className="cc-card" href={`/${region.key}/${c.c.toLowerCase()}`}>
