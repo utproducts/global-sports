@@ -8,7 +8,7 @@ export default function Header() {
       <div className="wrap nav">
         <Link className="brand" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/global-sports-menu.svg" alt="Global Sports" />
+          <img src="/global-icon-white-blue.png" alt="Global Sports" />
           <div className="name">
             GLOBAL SPORTS<small>CHAMPIONSHIP PROGRAM</small>
           </div>
