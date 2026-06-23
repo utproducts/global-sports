@@ -13,7 +13,7 @@ export default function Header() {
           </div>
         </Link>
         <nav className="nav-links">
-          <Link href="/events">Events</Link>
+          <Link href="/events">Flagship Events</Link>
           <Link href="/leagues">Leagues</Link>
           <Link href="/rankings">Rankings</Link>
           <Link href="/membership">Membership</Link>
