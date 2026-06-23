@@ -2,7 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WorldMap from "@/components/WorldMap";
-import { REGIONS, PRESENCE } from "@/lib/countries";
+import { CONTINENTS } from "@/lib/countries";
 
 export default function Home() {
   return (
@@ -19,16 +19,13 @@ export default function Home() {
             </div>
             <WorldMap />
             <div className="continent-tiles">
-              {REGIONS.map((r) => {
-                const active = r.countries.filter((c) => PRESENCE[c.c]).length;
-                return (
-                  <Link key={r.key} href={`/${r.key}`} className="ct">
-                    <span className="ct-flags">{r.countries.slice(0, 3).map((c) => c.f).join(" ")}</span>
-                    <span className="ct-name">{r.label}</span>
-                    <span className="ct-meta">{r.countries.length} countries{active ? ` · ${active} active` : ""}</span>
-                  </Link>
-                );
-              })}
+              {CONTINENTS.map((c) => (
+                <Link key={c.key} href={`/${c.key}`} className="ct">
+                  <span className="ct-flags">{c.flags}</span>
+                  <span className="ct-name">{c.label}</span>
+                  <span className="ct-meta">{c.live ? "Live now" : "Coming soon"}</span>
+                </Link>
+              ))}
             </div>
           </div>
           <div className="scroll-cue">Scroll to learn more about Global Sports<span className="arrow">↓</span></div>

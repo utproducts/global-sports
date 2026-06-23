@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { REGIONS, PRESENCE, byCode, ALL_COUNTRIES, type CountryEntry } from "@/lib/countries";
+import { REGIONS, PRESENCE, byCode, ALL_COUNTRIES, COUNTRY_CONTINENT, continentByKey, type CountryEntry } from "@/lib/countries";
 import { supabase } from "@/lib/supabase";
 import "jsvectormap/dist/jsvectormap.min.css";
 
@@ -57,43 +57,45 @@ export default function WorldMap() {
           ],
         },
         onRegionTooltipShow(_e: any, tooltip: any, code: string) {
-          const info = byCode[code];
-          if (info) tooltip.text(`${info.region.label} — click to explore`, true);
+          const cont = continentByKey(COUNTRY_CONTINENT[code]);
+          if (cont) tooltip.text(`${cont.label} — click to explore`, true);
           else tooltip.text("", true);
         },
         onRegionClick(_e: any, code: string) {
-          const info = byCode[code];
-          if (info) router.push(`/${info.region.key}`); // continent page, then pick country there
+          const cont = COUNTRY_CONTINENT[code];
+          if (cont) router.push(`/${cont}`); // continent page
         },
       });
 
-      // Continent-level hover: hovering any country brightens its whole continent.
-      const GOLD = "#f5c518", BLUE = "#3a5fa0", HOVER = "#ffd84a";
+      // Continent-level hover: hovering ANY country brightens its whole continent.
+      const GOLD = "#f5c518", BLUE = "#3a5fa0", NAVY = "#27406a", HOVER = "#ffd84a";
       const nodeToCode = new Map<Element, string>();
+      const continentCodes: Record<string, string[]> = {};
       Object.keys((map as any).regions || {}).forEach((code) => {
         const node = (map as any).regions[code]?.element?.shape?.node as Element | undefined;
         if (node) nodeToCode.set(node, code);
+        const cont = COUNTRY_CONTINENT[code];
+        if (cont) (continentCodes[cont] ||= []).push(code);
       });
+      const baseColor = (code: string) => (activeSet.has(code) ? GOLD : byCode[code] ? BLUE : NAVY);
       const setColor = (code: string, color: string) => {
         const el = (map as any).regions[code]?.element;
         if (el) { try { el.setStyle("fill", color); } catch {} } // fill only — keep the borders
       };
-      const paintRegion = (regionKey: string, hovering: boolean) => {
-        const reg = REGIONS.find((r) => r.key === regionKey);
-        if (!reg) return;
-        reg.countries.forEach((c) => setColor(c.c, hovering ? HOVER : (activeSet.has(c.c) ? GOLD : BLUE)));
+      const paintContinent = (cont: string, hovering: boolean) => {
+        (continentCodes[cont] || []).forEach((code) => setColor(code, hovering ? HOVER : baseColor(code)));
       };
       let currentCont: string | null = null;
       const onOver = (e: Event) => {
         const code = nodeToCode.get(e.target as Element);
-        const cont = code && byCode[code] ? byCode[code].region.key : null;
+        const cont = code ? COUNTRY_CONTINENT[code] : null;
         if (cont !== currentCont) {
-          if (currentCont) paintRegion(currentCont, false);
-          if (cont) paintRegion(cont, true);
+          if (currentCont) paintContinent(currentCont, false);
+          if (cont) paintContinent(cont, true);
           currentCont = cont;
         }
       };
-      const onLeave = () => { if (currentCont) { paintRegion(currentCont, false); currentCont = null; } };
+      const onLeave = () => { if (currentCont) { paintContinent(currentCont, false); currentCont = null; } };
       mapEl.current.addEventListener("mouseover", onOver);
       mapEl.current.addEventListener("mouseleave", onLeave);
 

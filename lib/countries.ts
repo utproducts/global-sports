@@ -81,3 +81,53 @@ export function findCountry(code: string): CountryEntry | undefined {
 export function regionByKey(key: string): Region | undefined {
   return REGIONS.find((r) => r.key === key);
 }
+
+// ----- Whole-world continent navigation -----
+export type Continent = { key: string; label: string; live: boolean; flags: string };
+export const CONTINENTS: Continent[] = [
+  { key: "europe", label: "Europe", live: true, flags: "🇪🇺 🇬🇧 🇩🇪" },
+  { key: "americas", label: "Americas", live: false, flags: "🇺🇸 🇨🇦 🇧🇷" },
+  { key: "middle-east", label: "Middle East", live: false, flags: "🇸🇦 🇦🇪 🇶🇦" },
+  { key: "asia", label: "Asia", live: false, flags: "🇯🇵 🇨🇳 🇮🇩" },
+  { key: "africa", label: "Africa", live: false, flags: "🇿🇦 🇳🇬 🇰🇪" },
+  { key: "oceania", label: "Oceania", live: false, flags: "🇦🇺 🇳🇿 🇫🇯" },
+];
+export const continentByKey = (k: string) => CONTINENTS.find((c) => c.key === k);
+
+// ISO-2 country code -> continent key (covers the world map's regions).
+export const COUNTRY_CONTINENT: Record<string, string> = {
+  // Europe
+  AL: "europe", AD: "europe", AT: "europe", BY: "europe", BE: "europe", BA: "europe", BG: "europe", HR: "europe",
+  CY: "europe", CZ: "europe", DK: "europe", EE: "europe", FI: "europe", FR: "europe", DE: "europe", GR: "europe",
+  HU: "europe", IS: "europe", IE: "europe", IT: "europe", XK: "europe", LV: "europe", LI: "europe", LT: "europe",
+  LU: "europe", MT: "europe", MD: "europe", MC: "europe", ME: "europe", NL: "europe", MK: "europe", NO: "europe",
+  PL: "europe", PT: "europe", RO: "europe", RU: "europe", SM: "europe", RS: "europe", SK: "europe", SI: "europe",
+  ES: "europe", SE: "europe", CH: "europe", UA: "europe", GB: "europe", GG: "europe", JE: "europe", IM: "europe", XI: "europe",
+  // Middle East
+  SA: "middle-east", AE: "middle-east", QA: "middle-east", KW: "middle-east", BH: "middle-east", OM: "middle-east",
+  YE: "middle-east", IQ: "middle-east", IR: "middle-east", IL: "middle-east", JO: "middle-east", LB: "middle-east",
+  SY: "middle-east", PS: "middle-east", TR: "middle-east",
+  // Asia
+  CN: "asia", JP: "asia", KR: "asia", KP: "asia", IN: "asia", PK: "asia", BD: "asia", LK: "asia", NP: "asia",
+  BT: "asia", MM: "asia", TH: "asia", VN: "asia", LA: "asia", KH: "asia", MY: "asia", SG: "asia", ID: "asia",
+  PH: "asia", BN: "asia", TL: "asia", MN: "asia", KZ: "asia", UZ: "asia", TM: "asia", KG: "asia", TJ: "asia",
+  AF: "asia", MV: "asia",
+  // Africa
+  DZ: "africa", AO: "africa", BJ: "africa", BW: "africa", BF: "africa", BI: "africa", CM: "africa", CV: "africa",
+  CF: "africa", TD: "africa", KM: "africa", CG: "africa", CD: "africa", CI: "africa", DJ: "africa", EG: "africa",
+  GQ: "africa", ER: "africa", SZ: "africa", ET: "africa", GA: "africa", GM: "africa", GH: "africa", GN: "africa",
+  GW: "africa", KE: "africa", LS: "africa", LR: "africa", LY: "africa", MG: "africa", MW: "africa", ML: "africa",
+  MR: "africa", MU: "africa", MA: "africa", MZ: "africa", NA: "africa", NE: "africa", NG: "africa", RW: "africa",
+  SN: "africa", SL: "africa", SO: "africa", ZA: "africa", SS: "africa", SD: "africa", TZ: "africa", TG: "africa",
+  TN: "africa", UG: "africa", ZM: "africa", ZW: "africa", EH: "africa", ST: "africa", SC: "africa",
+  // Oceania
+  AU: "oceania", NZ: "oceania", PG: "oceania", FJ: "oceania", SB: "oceania", VU: "oceania", NC: "oceania",
+  PF: "oceania", WS: "oceania", TO: "oceania", KI: "oceania", FM: "oceania", MH: "oceania", NR: "oceania",
+  PW: "oceania", TV: "oceania",
+  // Americas
+  US: "americas", CA: "americas", MX: "americas", GT: "americas", BZ: "americas", SV: "americas", HN: "americas",
+  NI: "americas", CR: "americas", PA: "americas", CU: "americas", DO: "americas", HT: "americas", JM: "americas",
+  BS: "americas", BB: "americas", TT: "americas", PR: "americas", BR: "americas", AR: "americas", CL: "americas",
+  CO: "americas", PE: "americas", VE: "americas", EC: "americas", BO: "americas", PY: "americas", UY: "americas",
+  GY: "americas", SR: "americas", CW: "americas", AW: "americas", GL: "americas",
+};

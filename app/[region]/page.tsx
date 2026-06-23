@@ -3,14 +3,39 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContinentMap from "@/components/ContinentMap";
-import { regionByKey, PRESENCE } from "@/lib/countries";
+import { regionByKey, continentByKey, PRESENCE } from "@/lib/countries";
 
 export const runtime = "edge";
 
 export default async function RegionPage({ params }: { params: Promise<{ region: string }> }) {
   const { region: regionKey } = await params;
   const region = regionByKey(regionKey);
-  if (!region) notFound();
+
+  // Continents we don't operate in yet (Africa, Oceania, …) → coming-soon page.
+  if (!region) {
+    const cont = continentByKey(regionKey);
+    if (!cont) notFound();
+    return (
+      <>
+        <Header />
+        <main className="map-hero" style={{ minHeight: "70vh" }}>
+          <div className="wrap" style={{ paddingTop: 80, paddingBottom: 80, textAlign: "center" }}>
+            <Link className="back" href="/" style={{ display: "inline-block", marginBottom: 14 }}>← All regions</Link>
+            <div className="eyebrow" style={{ color: "var(--gold)" }}>{cont.label}</div>
+            <h1 style={{ fontSize: "clamp(32px,5vw,52px)", fontWeight: 900, margin: "10px 0" }}>Coming soon to {cont.label}</h1>
+            <p style={{ color: "rgba(255,255,255,.8)", maxWidth: 560, margin: "0 auto 26px" }}>
+              Global Sports isn&apos;t live in {cont.label} yet. Want it in your country? Join the waitlist and you&apos;ll be first to know.
+            </p>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Link className="btn btn-primary" href="/signup">Join the waitlist</Link>
+              <Link className="btn btn-ghost" href="/europe">Explore Europe (live)</Link>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   const countries = [...region.countries].sort((a, b) => a.n.localeCompare(b.n));
   const activeCount = region.countries.filter((c) => PRESENCE[c.c]).length;
