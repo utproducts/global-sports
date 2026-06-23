@@ -11,12 +11,18 @@ import { byCode } from "@/lib/countries";
 type Ev = { slug: string | null; name: string; start_date: string | null; end_date: string | null; status: string | null; country_code: string | null; registered_teams: number | null; max_teams: number | null };
 
 const FLAGSHIP = [
-  { tag: "WORLD CUP", name: "World Slow-Pitch Championship", desc: "The World Cup of slow-pitch — the pinnacle event where the best from every continent compete for the global title.", color: "#1f3a8a" },
-  { tag: "EUROPE'S #1", name: "ESSC — European Slow-Pitch Championship", desc: "The top championship in Europe. A stable, prestigious brand and the event every European team builds their season around.", color: "#c8102e" },
-  { tag: "FLAGSHIP", name: "Global Games", desc: "Our marquee multi-nation showcase — elite competition and the Global Sports spectacle.", color: "#b8860b" },
+  { tag: "THE WORLD CUP", name: "World Slow-Pitch Championship", sub: "Global title", desc: "The pinnacle. The best teams from every continent collide for the world crown.", accent: "#f5c518", emblem: "🏆" },
+  { tag: "EUROPE'S #1", name: "ESSC", sub: "European Slow-Pitch Championship", desc: "The most prestigious championship in Europe — the event every team builds their season around.", accent: "#c8102e", emblem: "⭐" },
+  { tag: "FLAGSHIP", name: "Global Games", sub: "The showcase", desc: "Our marquee multi-nation spectacle — elite competition and the full Global Sports experience.", accent: "#2ea36b", emblem: "🌍" },
 ];
 
 const fmt = (d: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "TBD");
+const STATUS: Record<string, [string, string, string]> = {
+  registration_open: ["Registration open", "#138a45", "#e1f8ea"],
+  registration_closed: ["Closed", "#b3261e", "#fdecec"],
+  in_progress: ["Live now", "#8a6300", "#fff4e0"],
+  completed: ["Completed", "#5b6675", "#eef1f6"],
+};
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Ev[]>([]);
@@ -35,29 +41,63 @@ export default function EventsPage() {
     const region = e.country_code ? byCode[e.country_code]?.region.key : null;
     return region && e.slug ? `/${region}/${e.country_code!.toLowerCase()}/events/${e.slug}` : null;
   };
+  const featured = events.find((e) => e.status === "registration_open") || events[0];
+  const featuredHref = featured ? linkFor(featured) : null;
+  const totalTeams = events.reduce((s, e) => s + (e.registered_teams || 0), 0);
+  const countries = new Set(events.map((e) => e.country_code).filter(Boolean)).size;
 
   return (
     <>
       <Header />
       <main>
-        <section className="country-hero" style={{ paddingBottom: 26 }}>
+        {/* HERO */}
+        <section className="ev-hero">
           <div className="wrap">
-            <div className="eyebrow" style={{ color: "var(--gold)" }}>Events</div>
-            <h1>Flagship championships &amp; events</h1>
-            <p className="sub">The tentpole events of world slow-pitch — plus every Global Sports tournament, all in one place.</p>
+            <div className="eyebrow" style={{ color: "var(--gold)" }}>Flagship Events</div>
+            <h1>The events that<br /><span className="ev-grad">define the season.</span></h1>
+            <p>World slow-pitch, unified. From the World Cup to your local championship — every Global Sports event, one stage.</p>
+            <div className="ev-stats">
+              <div><span className="n">{events.length || "—"}</span><span className="l">Events</span></div>
+              <div><span className="n">{countries || "—"}</span><span className="l">Countries</span></div>
+              <div><span className="n">{totalTeams || "—"}</span><span className="l">Teams competing</span></div>
+              <div><span className="n">3</span><span className="l">Flagship titles</span></div>
+            </div>
           </div>
         </section>
+
+        {/* FEATURED */}
+        {featured && (
+          <div className="wrap" style={{ marginTop: -42, position: "relative", zIndex: 2 }}>
+            <div className="feat-banner">
+              <div>
+                <div className="feat-tag">★ Featured event</div>
+                <h2>{featured.name}</h2>
+                <p>{featured.country_code && <Flag code={featured.country_code} />} {fmt(featured.start_date)}{featured.end_date ? ` – ${fmt(featured.end_date)}` : ""}{featured.registered_teams != null ? ` · ${featured.registered_teams}${featured.max_teams ? `/${featured.max_teams}` : ""} teams` : ""}</p>
+              </div>
+              {featuredHref && (
+                <Link className="btn btn-primary" href={featured.status === "registration_open" ? `${featuredHref}/register` : featuredHref} style={{ padding: "14px 26px" }}>
+                  {featured.status === "registration_open" ? "Register now →" : "View event →"}
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* FLAGSHIP */}
         <section className="pad">
           <div className="wrap">
-            <div className="sec-head"><div className="eyebrow">Flagship programs</div><h2>The events that define the season</h2></div>
-            <div className="grid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
+            <div className="sec-head center"><div className="eyebrow">Flagship programs</div><h2>Three titles. One pursuit.</h2></div>
+            <div className="flagship">
               {FLAGSHIP.map((f) => (
-                <div key={f.name} className="card" style={{ borderTop: `4px solid ${f.color}` }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1, color: f.color }}>{f.tag}</div>
-                  <h3 style={{ margin: "8px 0" }}>{f.name}</h3>
-                  <p>{f.desc}</p>
+                <div key={f.name} className="fcard" style={{ ["--accent" as string]: f.accent }}>
+                  <span className="fcard-emblem">{f.emblem}</span>
+                  <div className="fcard-bar" />
+                  <div className="fcard-body">
+                    <div className="fcard-tag">{f.tag}</div>
+                    <h3>{f.name}</h3>
+                    <div className="fcard-sub">{f.sub}</div>
+                    <p>{f.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -71,17 +111,29 @@ export default function EventsPage() {
             {loading ? <p style={{ color: "var(--muted)" }}>Loading events…</p> : events.length === 0 ? (
               <p style={{ color: "var(--muted)" }}>No events yet.</p>
             ) : (
-              <div className="grid" style={{ gridTemplateColumns: "1fr" }}>
+              <div className="ev-list">
                 {events.map((e, i) => {
                   const href = linkFor(e);
                   const open = e.status === "registration_open";
+                  const pct = e.max_teams ? Math.min(100, Math.round(((e.registered_teams ?? 0) / e.max_teams) * 100)) : 0;
+                  const st = STATUS[e.status ?? ""] ?? [e.status ?? "", "#5b6675", "#eef1f6"];
                   return (
-                    <div key={i} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-                      <div>
-                        <h3 style={{ marginBottom: 4 }}>{href ? <Link href={href} style={{ color: "var(--navy)" }}>{e.name}</Link> : e.name}</h3>
-                        <p>{e.country_code && <Flag code={e.country_code} />} {fmt(e.start_date)}{e.end_date ? ` – ${fmt(e.end_date)}` : ""}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p>
+                    <div key={i} className="ev-card">
+                      <div className="ev-card-main">
+                        <div className="ev-card-date">
+                          <span className="d">{e.start_date ? new Date(e.start_date).getDate() : "–"}</span>
+                          <span className="m">{e.start_date ? new Date(e.start_date).toLocaleDateString("en-GB", { month: "short" }) : ""}</span>
+                        </div>
+                        <div>
+                          <h3>{href ? <Link href={href} style={{ color: "var(--navy)" }}>{e.name}</Link> : e.name}</h3>
+                          <p>{e.country_code && <Flag code={e.country_code} />} {fmt(e.start_date)}{e.end_date ? ` – ${fmt(e.end_date)}` : ""}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p>
+                          {e.max_teams ? <div className="cap-bar" style={{ maxWidth: 220, marginTop: 8 }}><span style={{ width: `${pct}%` }} /></div> : null}
+                        </div>
                       </div>
-                      {href && <Link className="btn btn-dark" href={open ? `${href}/register` : href} style={{ padding: "9px 16px" }}>{open ? "Register" : "Details"}</Link>}
+                      <div className="ev-card-side">
+                        <span className="status-pill" style={{ color: st[1], background: st[2] }}>{st[0]}</span>
+                        {href && <Link className="btn btn-dark" href={open ? `${href}/register` : href} style={{ padding: "9px 18px" }}>{open ? "Register" : "Details"}</Link>}
+                      </div>
                     </div>
                   );
                 })}
