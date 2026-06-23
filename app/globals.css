@@ -52,8 +52,6 @@ header.site{position:sticky;top:0;z-index:50;background:var(--bar);border-bottom
 .csearch-results .row:hover{background:var(--bg)}
 .csearch-results .row .tag{margin-left:auto;font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:999px;background:#fef3d6;color:#8a6300}
 .map-box{width:100%;height:min(560px,62vh);position:relative}
-/* landing map: no country borders -> reads as smooth continents */
-.map-flat path,.map-flat .jvm-region{stroke:none!important;stroke-width:0!important}
 .scroll-cue{text-align:center;padding:6px 0 26px;color:rgba(255,255,255,.6);font-size:13px;font-weight:600}
 .scroll-cue .arrow{display:block;font-size:20px;margin-top:4px;animation:bob 1.6s infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}

@@ -47,17 +47,15 @@ export default function WorldMap() {
         zoomOnScroll: false,
         backgroundColor: "transparent",
         regionStyle: {
-          // No country borders on the landing — reads as smooth continents, not a country map.
-          initial: { fill: "#27406a", stroke: "#27406a", strokeWidth: 0, fillOpacity: 1 },
-          hover: { fill: "#ffd84a", fillOpacity: 1, cursor: "pointer" },
+          // Each region's stroke matches its own fill -> adjacent same-color countries
+          // fuse into a seamless continent (kills SVG anti-alias seams = "borders").
+          initial: { fill: "#27406a", stroke: "#27406a", strokeWidth: 0.9, fillOpacity: 1 },
+          hover: { fill: "#ffd84a", stroke: "#ffd84a", fillOpacity: 1, cursor: "pointer" },
         },
         series: {
           regions: [
-            {
-              attribute: "fill",
-              scale: { active: "#f5c518", inProgram: "#3a5fa0" },
-              values: buildValues(new Set(Object.keys(PRESENCE))),
-            },
+            { attribute: "fill", scale: { active: "#f5c518", inProgram: "#3a5fa0" }, values: buildValues(new Set(Object.keys(PRESENCE))) },
+            { attribute: "stroke", scale: { active: "#f5c518", inProgram: "#3a5fa0" }, values: buildValues(new Set(Object.keys(PRESENCE))) },
           ],
         },
         onRegionTooltipShow(_e: any, tooltip: any, code: string) {
@@ -90,7 +88,9 @@ export default function WorldMap() {
               if (r.country_code) live.add(r.country_code);
             });
             if (live.size && map && !cancelled) {
-              map.series.regions[0].setValues(buildValues(live));
+              const lv = buildValues(live);
+              map.series.regions[0].setValues(lv);
+              map.series.regions[1]?.setValues(lv);
             }
           } catch {
             /* keep the immediate static coloring */
