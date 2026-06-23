@@ -47,7 +47,8 @@ export default function WorldMap() {
         zoomOnScroll: false,
         backgroundColor: "transparent",
         regionStyle: {
-          initial: { fill: "#27406a", stroke: "#0a1628", strokeWidth: 0.4, fillOpacity: 1 },
+          // No country borders on the landing — reads as smooth continents, not a country map.
+          initial: { fill: "#27406a", stroke: "#27406a", strokeWidth: 0, fillOpacity: 1 },
           hover: { fill: "#ffd84a", fillOpacity: 1, cursor: "pointer" },
         },
         series: {
