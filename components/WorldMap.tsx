@@ -31,7 +31,8 @@ export default function WorldMap() {
       if (cancelled || !mapEl.current) return;
 
       // jsvectormap series colors values through an ordinal SCALE (category -> color).
-      const buildValues = (activeSet: Set<string>) => {
+      let activeSet = new Set<string>(Object.keys(PRESENCE));
+      const buildValues = () => {
         const v: Record<string, string> = {};
         for (const r of REGIONS)
           for (const c of r.countries)
@@ -47,30 +48,54 @@ export default function WorldMap() {
         zoomOnScroll: false,
         backgroundColor: "transparent",
         regionStyle: {
-          // Each region's stroke matches its own fill -> adjacent same-color countries
-          // fuse into a seamless continent (kills SVG anti-alias seams = "borders").
-          initial: { fill: "#27406a", stroke: "#27406a", strokeWidth: 0.9, fillOpacity: 1 },
-          hover: { fill: "#ffd84a", stroke: "#ffd84a", fillOpacity: 1, cursor: "pointer" },
+          initial: { fill: "#27406a", stroke: "#0a1628", strokeWidth: 0.4, fillOpacity: 1 },
+          hover: { cursor: "pointer" }, // per-country hover disabled; whole-region hover handled below
         },
         series: {
           regions: [
-            { attribute: "fill", scale: { active: "#f5c518", inProgram: "#3a5fa0" }, values: buildValues(new Set(Object.keys(PRESENCE))) },
-            { attribute: "stroke", scale: { active: "#f5c518", inProgram: "#3a5fa0" }, values: buildValues(new Set(Object.keys(PRESENCE))) },
+            { attribute: "fill", scale: { active: "#f5c518", inProgram: "#3a5fa0" }, values: buildValues() },
           ],
         },
         onRegionTooltipShow(_e: any, tooltip: any, code: string) {
           const info = byCode[code];
-          if (info) {
-            const p = info.presence;
-            const extra = p ? ` — ${p.teams} team${p.teams > 1 ? "s" : ""} active` : "";
-            tooltip.text(`${info.country.f} ${info.country.n}${extra}`, true);
-          }
+          if (info) tooltip.text(`${info.region.label} — click to explore`, true);
+          else tooltip.text("", true);
         },
         onRegionClick(_e: any, code: string) {
           const info = byCode[code];
           if (info) router.push(`/${info.region.key}`); // continent page, then pick country there
         },
       });
+
+      // Continent-level hover: hovering any country brightens its whole continent.
+      const GOLD = "#f5c518", BLUE = "#3a5fa0", HOVER = "#ffd84a";
+      const nodeToCode = new Map<Element, string>();
+      Object.keys((map as any).regions || {}).forEach((code) => {
+        const node = (map as any).regions[code]?.element?.shape?.node as Element | undefined;
+        if (node) nodeToCode.set(node, code);
+      });
+      const setColor = (code: string, color: string) => {
+        const el = (map as any).regions[code]?.element;
+        if (el) { try { el.setStyle("fill", color); } catch {} } // fill only — keep the borders
+      };
+      const paintRegion = (regionKey: string, hovering: boolean) => {
+        const reg = REGIONS.find((r) => r.key === regionKey);
+        if (!reg) return;
+        reg.countries.forEach((c) => setColor(c.c, hovering ? HOVER : (activeSet.has(c.c) ? GOLD : BLUE)));
+      };
+      let currentCont: string | null = null;
+      const onOver = (e: Event) => {
+        const code = nodeToCode.get(e.target as Element);
+        const cont = code && byCode[code] ? byCode[code].region.key : null;
+        if (cont !== currentCont) {
+          if (currentCont) paintRegion(currentCont, false);
+          if (cont) paintRegion(cont, true);
+          currentCont = cont;
+        }
+      };
+      const onLeave = () => { if (currentCont) { paintRegion(currentCont, false); currentCont = null; } };
+      mapEl.current.addEventListener("mouseover", onOver);
+      mapEl.current.addEventListener("mouseleave", onLeave);
 
       // 2) Enhance with LIVE data (countries with teams/events) — non-blocking.
       if (supabase) {
@@ -88,9 +113,8 @@ export default function WorldMap() {
               if (r.country_code) live.add(r.country_code);
             });
             if (live.size && map && !cancelled) {
-              const lv = buildValues(live);
-              map.series.regions[0].setValues(lv);
-              map.series.regions[1]?.setValues(lv);
+              activeSet = live;
+              map.series.regions[0].setValues(buildValues());
             }
           } catch {
             /* keep the immediate static coloring */
