@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WorldMap from "@/components/WorldMap";
+import Flag from "@/components/Flag";
 import { CONTINENTS } from "@/lib/countries";
 
 export default function Home() {
@@ -21,7 +22,7 @@ export default function Home() {
             <div className="continent-tiles">
               {CONTINENTS.map((c) => (
                 <Link key={c.key} href={`/${c.key}`} className="ct">
-                  <span className="ct-flags">{c.flags}</span>
+                  <span className="ct-flags">{c.codes.map((code) => <Flag key={code} code={code} />)}</span>
                   <span className="ct-name">{c.label}</span>
                   <span className="ct-meta">{c.live ? "Live now" : "Coming soon"}</span>
                 </Link>

@@ -83,14 +83,14 @@ export function regionByKey(key: string): Region | undefined {
 }
 
 // ----- Whole-world continent navigation -----
-export type Continent = { key: string; label: string; live: boolean; flags: string };
+export type Continent = { key: string; label: string; live: boolean; codes: string[] };
 export const CONTINENTS: Continent[] = [
-  { key: "europe", label: "Europe", live: true, flags: "🇪🇺 🇬🇧 🇩🇪" },
-  { key: "americas", label: "Americas", live: false, flags: "🇺🇸 🇨🇦 🇧🇷" },
-  { key: "middle-east", label: "Middle East", live: false, flags: "🇸🇦 🇦🇪 🇶🇦" },
-  { key: "asia", label: "Asia", live: false, flags: "🇯🇵 🇨🇳 🇮🇩" },
-  { key: "africa", label: "Africa", live: false, flags: "🇿🇦 🇳🇬 🇰🇪" },
-  { key: "oceania", label: "Oceania", live: false, flags: "🇦🇺 🇳🇿 🇫🇯" },
+  { key: "europe", label: "Europe", live: true, codes: ["eu", "gb", "de"] },
+  { key: "americas", label: "Americas", live: false, codes: ["us", "ca", "br"] },
+  { key: "middle-east", label: "Middle East", live: false, codes: ["sa", "ae", "qa"] },
+  { key: "asia", label: "Asia", live: false, codes: ["jp", "cn", "id"] },
+  { key: "africa", label: "Africa", live: false, codes: ["za", "ng", "ke"] },
+  { key: "oceania", label: "Oceania", live: false, codes: ["au", "nz", "fj"] },
 ];
 export const continentByKey = (k: string) => CONTINENTS.find((c) => c.key === k);
 

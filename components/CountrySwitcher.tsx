@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { REGIONS, PRESENCE, ALL_COUNTRIES } from "@/lib/countries";
+import Flag from "./Flag";
 
 export default function CountrySwitcher() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function CountrySwitcher() {
                 filtered.length ? (
                   filtered.map((e) => (
                     <button key={e.country.c} className="cswitch-row" onClick={() => go(e.region.key, e.country.c)}>
-                      <span className="csr-flag">{e.country.f}</span>
+                      <span className="csr-flag"><Flag code={e.country.c} /></span>
                       <span className="csr-name">{e.country.n}</span>
                       {PRESENCE[e.country.c] && <span className="csr-dot" title="Active here" />}
                     </button>
@@ -65,7 +66,7 @@ export default function CountrySwitcher() {
                       .sort((a, b) => a.n.localeCompare(b.n))
                       .map((c) => (
                         <button key={c.c} className="cswitch-row" onClick={() => go(r.key, c.c)}>
-                          <span className="csr-flag">{c.f}</span>
+                          <span className="csr-flag"><Flag code={c.c} /></span>
                           <span className="csr-name">{c.n}</span>
                           {PRESENCE[c.c] && <span className="csr-dot" title="Active here" />}
                         </button>

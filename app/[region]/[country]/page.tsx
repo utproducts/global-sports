@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CountryNav from "@/components/CountryNav";
+import Flag from "@/components/Flag";
 import { regionByKey, findCountry, PRESENCE } from "@/lib/countries";
 import { supabase } from "@/lib/supabase";
 
@@ -88,7 +89,7 @@ export default async function CountryPage({
         <section className="country-hero">
           <div className="wrap">
             <Link className="back" href={`/${region.key}`}>← {region.label}</Link>
-            <div className="flagbig">{c.f}</div>
+            <div className="flagbig"><Flag code={c.c} style={{ width: "1.4em", height: "1em", borderRadius: 6 }} /></div>
             <h1>Global Sports {c.n}</h1>
             <p className="sub">Adult slow-pitch championship play in {c.n} — part of the {region.label} program.</p>
             <div className="chips">
@@ -144,7 +145,7 @@ export default async function CountryPage({
               <div className="region-countries">
                 {teams.map((t, i) => (
                   <div key={i} className="cc-card">
-                    <span className="flag">{c.f}</span>
+                    <span className="flag"><Flag code={c.c} /></span>
                     <span className="meta">
                       <span className="cn">{t.name}</span>
                       <span className="cc">{t.city ?? c.n}{t.current_class ? ` · ${t.current_class}` : ""}</span>

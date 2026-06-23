@@ -13,8 +13,9 @@ export default function Header() {
           </div>
         </Link>
         <nav className="nav-links">
-          <Link href="/#why">Why us</Link>
-          <Link href="/#how">How it works</Link>
+          <Link href="/events">Events</Link>
+          <Link href="/leagues">Leagues</Link>
+          <Link href="/rankings">Rankings</Link>
           <Link href="/membership">Membership</Link>
           <Link href="/login">Log in</Link>
           <CountrySwitcher />

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContinentMap from "@/components/ContinentMap";
+import Flag from "@/components/Flag";
 import { regionByKey, continentByKey, PRESENCE } from "@/lib/countries";
 
 export const runtime = "edge";
@@ -66,7 +67,7 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
             <div className="region-countries">
               {countries.map((c) => (
                 <Link key={c.c} className="cc-card" href={`/${region.key}/${c.c.toLowerCase()}`}>
-                  <span className="flag">{c.f}</span>
+                  <span className="flag"><Flag code={c.c} /></span>
                   <span className="meta">
                     <span className="cn">{c.n}</span>
                     <span className="cc">{c.c} · {c.cur}</span>
