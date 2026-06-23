@@ -13,21 +13,22 @@ const ITEMS = [
 export default function AudienceMenu() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="amenu" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <div className="amenu">
       <button className="amenu-btn" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
         For you <span className="cs-caret">▾</span>
       </button>
       {open && (
-        <div className="amenu-panel" role="menu">
-          {ITEMS.map((i) => (
-            <Link key={i.href} href={i.href} className="amenu-row" onClick={() => setOpen(false)}>
-              <span>
+        <>
+          <div className="amenu-backdrop" onClick={() => setOpen(false)} />
+          <div className="amenu-panel" role="menu">
+            {ITEMS.map((i) => (
+              <Link key={i.href} href={i.href} className="amenu-row" onClick={() => setOpen(false)}>
                 <span className="amenu-title">{i.title}</span>
                 <span className="amenu-desc">{i.desc}</span>
-              </span>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
