@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CountrySwitcher from "./CountrySwitcher";
+import AudienceMenu from "./AudienceMenu";
 
 export default function Header() {
   return (
@@ -13,8 +14,8 @@ export default function Header() {
           </div>
         </Link>
         <nav className="nav-links">
+          <AudienceMenu />
           <Link href="/events">Flagship Events</Link>
-          <Link href="/leagues">Leagues</Link>
           <Link href="/rankings">Rankings</Link>
           <Link href="/membership">Membership</Link>
           <Link href="/login">Log in</Link>
