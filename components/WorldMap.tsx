@@ -145,7 +145,7 @@ export default function WorldMap() {
           )}
         </div>
       </div>
-      <div className="map-box"><div ref={mapEl} style={{ width: "100%", height: "100%" }} /></div>
+      <div className="map-box map-flat"><div ref={mapEl} style={{ width: "100%", height: "100%" }} /></div>
     </>
   );
 }
