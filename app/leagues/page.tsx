@@ -2,46 +2,52 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Flag from "@/components/Flag";
-
-const LEAGUES = [
-  { code: "PL", name: "Polish Slow-Pitch League", country: "Poland", note: "National league play across the season.", live: true },
-  { code: "AT", name: "Austrian Slow-Pitch League", country: "Austria", note: "Club competition throughout the year.", live: true },
-];
+import { LEAGUES } from "@/lib/leagues";
 
 export default function LeaguesPage() {
+  const totalTeams = LEAGUES.reduce((s, l) => s + l.teams, 0);
   return (
     <>
       <Header />
       <main>
-        <section className="country-hero" style={{ paddingBottom: 26 }}>
+        {/* HERO */}
+        <section className="ev-hero">
           <div className="wrap">
             <div className="eyebrow" style={{ color: "var(--gold)" }}>Leagues</div>
-            <h1>League play, season-long</h1>
-            <p className="sub">Beyond one-off tournaments — recurring national and club leagues under the Global Sports standard, feeding the global ranking.</p>
+            <h1>League play,<br /><span className="ev-grad">season after season.</span></h1>
+            <p>Beyond one-off tournaments — recurring national and club leagues under one standard, every result feeding the global ranking.</p>
+            <div className="ev-stats">
+              <div><span className="n">{LEAGUES.length}</span><span className="l">Leagues</span></div>
+              <div><span className="n">{new Set(LEAGUES.map((l) => l.code)).size}</span><span className="l">Countries</span></div>
+              <div><span className="n">{totalTeams}</span><span className="l">Clubs competing</span></div>
+            </div>
           </div>
         </section>
 
+        {/* LEAGUE CARDS */}
         <section className="pad">
           <div className="wrap">
-            <div className="sec-head"><div className="eyebrow">Our leagues</div><h2>Where teams compete week to week</h2></div>
-            <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
+            <div className="sec-head center"><div className="eyebrow">Our leagues</div><h2>Where teams compete week to week</h2></div>
+            <div className="flagship">
               {LEAGUES.map((l) => (
-                <div key={l.code} className="card">
-                  <div style={{ fontSize: 30, marginBottom: 8 }}><Flag code={l.code} style={{ width: "1.8em", height: "1.3em" }} /></div>
-                  <h3 style={{ marginBottom: 4 }}>{l.name}</h3>
-                  <p style={{ marginBottom: 12 }}>{l.country} · {l.note}</p>
-                  <span className="chip" style={{ background: "#e1f8ea", color: "#138a45", border: "none" }}>Active</span>
-                  <div style={{ marginTop: 14 }}>
-                    <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>Standings &amp; schedule — coming soon</span>
+                <Link key={l.slug} href={`/leagues/${l.slug}`} className="fcard" style={{ ["--accent" as string]: l.accent, textDecoration: "none" }}>
+                  <span className="fcard-emblem"><Flag code={l.code} style={{ width: "1.4em", height: "1em", borderRadius: 8 }} /></span>
+                  <div className="fcard-bar" />
+                  <div className="fcard-body">
+                    <div className="fcard-tag">{l.season}</div>
+                    <h3>{l.name}</h3>
+                    <div className="fcard-sub">{l.country} · {l.teams} clubs</div>
+                    <p>{l.desc}</p>
+                    <span style={{ color: "#fff", fontWeight: 700, fontSize: 14, marginTop: 14, display: "inline-block" }}>View league →</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
             <div style={{ marginTop: 40, padding: 28, borderRadius: 16, border: "1.5px solid var(--line)", textAlign: "center" }}>
               <h3 style={{ fontSize: 20, fontWeight: 800 }}>Run a league?</h3>
-              <p style={{ color: "var(--muted)", margin: "8px 0 16px", maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
-                Bring your national or regional league onto Global Sports — standings, schedules, registrations and ranking points, all managed in one place.
+              <p style={{ color: "var(--muted)", margin: "8px auto 16px", maxWidth: 520 }}>
+                Bring your national or regional league onto Global Sports — standings, schedules, registrations and ranking points, all in one place.
               </p>
               <Link className="btn btn-primary" href="/signup">Become an organizer</Link>
             </div>
