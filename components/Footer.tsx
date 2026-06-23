@@ -15,10 +15,17 @@ export default function Footer() {
           </div>
           <div className="foot-links">
             <div className="foot-col">
-              <h4>Program</h4>
-              <Link href="/#why">Why us</Link>
-              <Link href="/#how">How it works</Link>
-              <Link href="/#membership">Membership</Link>
+              <h4>Who it&apos;s for</h4>
+              <Link href="/players">Players</Link>
+              <Link href="/teams">Teams</Link>
+              <Link href="/organizers">Organizers</Link>
+              <Link href="/leagues">Leagues</Link>
+            </div>
+            <div className="foot-col">
+              <h4>Explore</h4>
+              <Link href="/events">Flagship Events</Link>
+              <Link href="/rankings">Rankings</Link>
+              <Link href="/membership">Membership</Link>
             </div>
             <div className="foot-col">
               <h4>Regions</h4>

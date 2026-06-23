@@ -49,6 +49,19 @@ export default function Home() {
           </div>
         </section>
 
+        {/* AUDIENCES */}
+        <section className="pad" id="audiences" style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="sec-head center"><div className="eyebrow">Who it&apos;s for</div><h2>Built for everyone in the game.</h2></div>
+            <div className="grid why">
+              <a href="/players" className="card"><div className="ic">🥎</div><h3>Players</h3><p>One membership, every country, one global ranking. →</p></a>
+              <a href="/teams" className="card"><div className="ic">👥</div><h3>Teams</h3><p>Manage your roster and register for events in clicks. →</p></a>
+              <a href="/organizers" className="card"><div className="ic">🗓️</div><h3>Organizers</h3><p>Run world-class tournaments with global reach. →</p></a>
+              <a href="/leagues" className="card"><div className="ic">🏆</div><h3>Leagues</h3><p>Season-long league play under one standard. →</p></a>
+            </div>
+          </div>
+        </section>
+
         {/* HOW */}
         <section className="pad steps-sec" id="how">
           <div className="wrap">
