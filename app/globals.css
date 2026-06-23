@@ -22,7 +22,7 @@ img{display:block}
 header.site{position:sticky;top:0;z-index:50;background:var(--bar);border-bottom:1px solid rgba(10,22,40,.13)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
 .brand{display:flex;align-items:center;gap:12px;color:var(--navy)}
-.brand img{height:40px;width:40px;object-fit:contain;filter:drop-shadow(1.2px 0 0 var(--navy)) drop-shadow(-1.2px 0 0 var(--navy)) drop-shadow(0 1.2px 0 var(--navy)) drop-shadow(0 -1.2px 0 var(--navy))}
+.brand img{height:40px;width:40px;object-fit:contain}
 .brand .name{font-weight:900;letter-spacing:.5px;font-size:18px;line-height:1}
 .brand .name small{display:block;font-size:9px;font-weight:700;letter-spacing:3px;color:rgba(10,22,40,.65);margin-top:3px}
 .nav-links{display:flex;align-items:center;gap:28px}
