@@ -16,6 +16,16 @@ export const HIERARCHY: Tier[] = [
   { key: "player", label: "Player", scope: "Self — profile & membership", dbRoles: ["player"] },
 ];
 
+// Self-selectable account roles (a user can have several).
+export type AccountRole = { key: string; label: string; desc: string };
+export const ACCOUNT_ROLES: AccountRole[] = [
+  { key: "player", label: "Player", desc: "Compete, get ranked, and manage your membership" },
+  { key: "coach", label: "Coach", desc: "Lead a team and manage your roster" },
+  { key: "manager", label: "Team Manager", desc: "Run a team and register it for events" },
+  { key: "organizer", label: "Event Organizer", desc: "Create and run tournaments" },
+  { key: "league", label: "League Operator", desc: "Run a league across a season" },
+];
+
 export function tierForRole(dbRole?: string | null): Tier {
   const r = (dbRole || "").toLowerCase();
   return HIERARCHY.find((t) => t.dbRoles.includes(r)) ?? HIERARCHY[HIERARCHY.length - 1];

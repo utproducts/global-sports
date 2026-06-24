@@ -10,6 +10,37 @@ import CountrySwitcher from "@/components/CountrySwitcher";
 type Profile = { first_name?: string; last_name?: string; role?: string; email?: string };
 type Scope = { role: string; scope_type: string; scope_value: string | null };
 
+type Link2 = { label: string; href: string; soon?: boolean };
+type Module = { title: string; links: Link2[] };
+const ROLE_MODULES: Record<string, Module> = {
+  player: { title: "Player", links: [
+    { label: "My membership", href: "/membership" },
+    { label: "Global rankings", href: "/rankings" },
+    { label: "Find an event", href: "/events" },
+    { label: "Edit my player profile", href: "#", soon: true },
+  ] },
+  coach: { title: "Coach", links: [
+    { label: "My teams", href: "#", soon: true },
+    { label: "Manage roster", href: "#", soon: true },
+    { label: "Register a team", href: "/events" },
+  ] },
+  manager: { title: "Team Manager", links: [
+    { label: "My teams", href: "#", soon: true },
+    { label: "Register for an event", href: "/events" },
+    { label: "Team rankings", href: "/rankings" },
+  ] },
+  organizer: { title: "Event Organizer", links: [
+    { label: "Create an event", href: "#", soon: true },
+    { label: "Manage my events", href: "#", soon: true },
+    { label: "Flagship programs", href: "/events" },
+  ] },
+  league: { title: "League Operator", links: [
+    { label: "Manage leagues", href: "/leagues" },
+    { label: "Create a league", href: "#", soon: true },
+    { label: "Standings & results", href: "/leagues" },
+  ] },
+};
+
 export default function Dashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -18,6 +49,7 @@ export default function Dashboard() {
   const [scopes, setScopes] = useState<Scope[]>([]);
   const [tier, setTier] = useState<Tier>(HIERARCHY[HIERARCHY.length - 1]);
   const [membership, setMembership] = useState<{ tier: string; status: string; expires_at: string | null } | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -25,6 +57,8 @@ export default function Dashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
       setEmail(session.user.email ?? "");
+      const md = session.user.user_metadata as { roles?: string[] } | undefined;
+      if (md?.roles?.length) setRoles(md.roles);
 
       const { data: prof } = await supabase
         .from("users")
@@ -103,6 +137,28 @@ export default function Dashboard() {
           </div>
           {!membership && <Link className="btn btn-primary" href="/membership">Get membership</Link>}
         </div>
+
+        {roles.length > 0 && (
+          <>
+            <h2 style={{ fontSize: 18, fontWeight: 800, margin: "34px 0 4px" }}>Your roles &amp; tools</h2>
+            <p style={{ color: "var(--muted)", fontSize: 14 }}>Built from the roles you chose at sign-up. Add more anytime.</p>
+            <div className="dash-mods">
+              {roles.filter((r) => ROLE_MODULES[r]).map((r) => {
+                const m = ROLE_MODULES[r];
+                return (
+                  <div key={r} className="dash-mod">
+                    <span className="mh">{m.title}</span>
+                    {m.links.map((l) => (
+                      l.soon
+                        ? <a key={l.label} className="soon">{l.label} <span className="sb">SOON</span></a>
+                        : <Link key={l.label} href={l.href}>{l.label} <span aria-hidden>→</span></Link>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: "34px 0 14px" }}>Access hierarchy</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 640 }}>

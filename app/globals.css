@@ -173,6 +173,24 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 .auth-error{background:#fdecec;color:#b3261e;font-size:13px;font-weight:600;padding:10px 12px;border-radius:9px}
 .auth-foot{text-align:center;font-size:13px;color:var(--muted);margin-top:18px}
 .auth-foot a{color:var(--navy);font-weight:700}
+/* role picker */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+@media(max-width:480px){.role-grid{grid-template-columns:1fr}}
+.role-card{position:relative;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 36px 12px 14px;cursor:pointer;font-family:inherit;transition:.14s}
+.role-card:hover{border-color:#cfd6e2}
+.role-card.on{border-color:var(--navy);background:#fff8df}
+.role-check{position:absolute;top:11px;right:11px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff}
+.role-card.on .role-check{background:var(--navy);border-color:var(--navy)}
+.role-name{display:block;font-weight:800;font-size:14px;color:var(--ink)}
+.role-desc{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.3}
+/* dashboard role modules */
+.dash-mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:14px}
+.dash-mod{border:1px solid var(--line);border-radius:14px;padding:20px}
+.dash-mod .mh{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);background:var(--navy);display:inline-block;padding:3px 10px;border-radius:999px;margin-bottom:12px}
+.dash-mod a{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:var(--navy);padding:9px 0;border-bottom:1px solid var(--line)}
+.dash-mod a:last-child{border-bottom:none}
+.dash-mod a.soon{color:var(--muted)}
+.dash-mod a .sb{font-size:9.5px;font-weight:800;letter-spacing:.5px;color:#8a6300;background:#fff4e0;padding:2px 7px;border-radius:999px}
 
 /* COUNTRY SWITCHER */
 .cswitch{position:relative;display:inline-block}
