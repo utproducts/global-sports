@@ -31,7 +31,7 @@ export default function Footer() {
               <h4>Regions</h4>
               <Link href="/europe">Europe</Link>
               <Link href="/middle-east">Middle East</Link>
-              <Link href="/asia">Asia</Link>
+              <Link href="/southeast-asia">Southeast Asia</Link>
               <Link href="/americas">Americas</Link>
             </div>
             <div className="foot-col">

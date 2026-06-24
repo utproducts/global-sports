@@ -34,8 +34,12 @@ export const REGIONS: Region[] = [
     ],
   },
   {
-    key: "asia", label: "Asia", subdomain: "asia.globalsports.com",
-    countries: [{ c: "ID", n: "Indonesia", f: "🇮🇩", cur: "IDR" }],
+    key: "southeast-asia", label: "Southeast Asia", subdomain: "sea.globalsports.com",
+    countries: [
+      { c: "ID", n: "Indonesia", f: "🇮🇩", cur: "IDR" }, { c: "TH", n: "Thailand", f: "🇹🇭", cur: "THB" },
+      { c: "VN", n: "Vietnam", f: "🇻🇳", cur: "VND" }, { c: "PH", n: "Philippines", f: "🇵🇭", cur: "PHP" },
+      { c: "MY", n: "Malaysia", f: "🇲🇾", cur: "MYR" }, { c: "SG", n: "Singapore", f: "🇸🇬", cur: "SGD" },
+    ],
   },
   {
     key: "americas", label: "Americas", subdomain: "americas.globalsports.com",
@@ -83,18 +87,21 @@ export function regionByKey(key: string): Region | undefined {
 }
 
 // ----- Whole-world continent navigation -----
+// Global Sports market regions (emotionally resonant, not generic continents).
 export type Continent = { key: string; label: string; live: boolean; codes: string[] };
 export const CONTINENTS: Continent[] = [
   { key: "europe", label: "Europe", live: true, codes: ["eu", "gb", "de"] },
   { key: "americas", label: "Americas", live: false, codes: ["us", "ca", "br"] },
   { key: "middle-east", label: "Middle East", live: false, codes: ["sa", "ae", "qa"] },
-  { key: "asia", label: "Asia", live: false, codes: ["jp", "cn", "id"] },
+  { key: "southeast-asia", label: "Southeast Asia", live: false, codes: ["id", "th", "ph"] },
+  { key: "east-asia", label: "East Asia", live: false, codes: ["jp", "cn", "kr"] },
+  { key: "south-asia", label: "South Asia", live: false, codes: ["in", "pk", "lk"] },
   { key: "africa", label: "Africa", live: false, codes: ["za", "ng", "ke"] },
   { key: "oceania", label: "Oceania", live: false, codes: ["au", "nz", "fj"] },
 ];
 export const continentByKey = (k: string) => CONTINENTS.find((c) => c.key === k);
 
-// ISO-2 country code -> continent key (covers the world map's regions).
+// ISO-2 country code -> market region key (covers the world map's regions).
 export const COUNTRY_CONTINENT: Record<string, string> = {
   // Europe
   AL: "europe", AD: "europe", AT: "europe", BY: "europe", BE: "europe", BA: "europe", BG: "europe", HR: "europe",
@@ -107,11 +114,14 @@ export const COUNTRY_CONTINENT: Record<string, string> = {
   SA: "middle-east", AE: "middle-east", QA: "middle-east", KW: "middle-east", BH: "middle-east", OM: "middle-east",
   YE: "middle-east", IQ: "middle-east", IR: "middle-east", IL: "middle-east", JO: "middle-east", LB: "middle-east",
   SY: "middle-east", PS: "middle-east", TR: "middle-east",
-  // Asia
-  CN: "asia", JP: "asia", KR: "asia", KP: "asia", IN: "asia", PK: "asia", BD: "asia", LK: "asia", NP: "asia",
-  BT: "asia", MM: "asia", TH: "asia", VN: "asia", LA: "asia", KH: "asia", MY: "asia", SG: "asia", ID: "asia",
-  PH: "asia", BN: "asia", TL: "asia", MN: "asia", KZ: "asia", UZ: "asia", TM: "asia", KG: "asia", TJ: "asia",
-  AF: "asia", MV: "asia",
+  // East Asia
+  CN: "east-asia", JP: "east-asia", KR: "east-asia", KP: "east-asia", MN: "east-asia", TW: "east-asia", HK: "east-asia", MO: "east-asia",
+  // Southeast Asia
+  MM: "southeast-asia", TH: "southeast-asia", VN: "southeast-asia", LA: "southeast-asia", KH: "southeast-asia",
+  MY: "southeast-asia", SG: "southeast-asia", ID: "southeast-asia", PH: "southeast-asia", BN: "southeast-asia", TL: "southeast-asia",
+  // South & Central Asia
+  IN: "south-asia", PK: "south-asia", BD: "south-asia", LK: "south-asia", NP: "south-asia", BT: "south-asia", MV: "south-asia",
+  AF: "south-asia", KZ: "south-asia", UZ: "south-asia", TM: "south-asia", KG: "south-asia", TJ: "south-asia",
   // Africa
   DZ: "africa", AO: "africa", BJ: "africa", BW: "africa", BF: "africa", BI: "africa", CM: "africa", CV: "africa",
   CF: "africa", TD: "africa", KM: "africa", CG: "africa", CD: "africa", CI: "africa", DJ: "africa", EG: "africa",
