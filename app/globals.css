@@ -265,6 +265,23 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 .champ-flag{font-size:16px}
 .champ-pill{font-size:11px;font-weight:800;letter-spacing:.3px;background:var(--bg);color:#33404f;padding:4px 9px;border-radius:999px}
 
+/* FLAGSHIP EVENT LANDING */
+.fl-hero{background-size:cover;background-position:center;color:#fff;padding:92px 0 58px}
+.fl-hero-inner{max-width:760px}
+.fl-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;color:#0a1628;padding:5px 12px;border-radius:999px;margin:14px 0 14px}
+.fl-hero h1{font-size:clamp(34px,6vw,60px);font-weight:900;line-height:1.02;letter-spacing:-1px}
+.fl-tagline{font-size:clamp(17px,2.4vw,22px);color:rgba(255,255,255,.85);margin-top:8px}
+.fl-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px;font-size:14px;font-weight:600;color:rgba(255,255,255,.92);align-items:center}
+.fl-meta span{display:inline-flex;align-items:center;gap:7px}
+.fl-status{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:4px 12px;border-radius:999px;font-size:12px}
+.fl-about{display:grid;grid-template-columns:1.6fr 1fr;gap:36px}
+@media(max-width:760px){.fl-about{grid-template-columns:1fr}.fl-hero{padding:64px 0 44px}}
+.fl-details{border:1px solid var(--line);border-radius:16px;padding:6px 20px;align-self:start}
+.fl-d{display:flex;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.fl-d:last-child{border-bottom:none}
+.fl-d .l{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.fl-d .v{font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-align:right}
+
 /* league standings table */
 .lstand-row{display:grid;grid-template-columns:30px 1fr 30px 32px 30px 28px 52px 52px 44px;gap:6px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
 .lstand-row:last-child{border-bottom:none}

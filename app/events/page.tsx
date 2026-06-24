@@ -7,14 +7,9 @@ import Footer from "@/components/Footer";
 import Flag from "@/components/Flag";
 import { supabase } from "@/lib/supabase";
 import { byCode } from "@/lib/countries";
+import { FLAGSHIPS } from "@/lib/flagships";
 
 type Ev = { slug: string | null; name: string; start_date: string | null; end_date: string | null; status: string | null; country_code: string | null; registered_teams: number | null; max_teams: number | null };
-
-const FLAGSHIP = [
-  { tag: "THE WORLD CUP", name: "World Slow-Pitch Championship", sub: "Global title", desc: "The pinnacle. The best teams from every continent collide for the world crown.", accent: "#f5c518", emblem: "🏆" },
-  { tag: "EUROPE'S #1", name: "ESSC", sub: "European Slow-Pitch Championship", desc: "The most prestigious championship in Europe — the event every team builds their season around.", accent: "#c8102e", emblem: "⭐" },
-  { tag: "FLAGSHIP", name: "Global Games", sub: "The showcase", desc: "Our marquee multi-nation spectacle — elite competition and the full Global Sports experience.", accent: "#2ea36b", emblem: "🌍" },
-];
 
 const fmt = (d: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "TBD");
 const STATUS: Record<string, [string, string, string]> = {
@@ -88,17 +83,17 @@ export default function EventsPage() {
           <div className="wrap">
             <div className="sec-head center"><div className="eyebrow">Flagship programs</div><h2>Three titles. One pursuit.</h2></div>
             <div className="flagship">
-              {FLAGSHIP.map((f) => (
-                <div key={f.name} className="fcard" style={{ ["--accent" as string]: f.accent }}>
-                  <span className="fcard-emblem">{f.emblem}</span>
+              {FLAGSHIPS.map((f) => (
+                <Link key={f.slug} href={`/flagship/${f.slug}`} className="fcard" style={{ ["--accent" as string]: f.accent, textDecoration: "none" }}>
                   <div className="fcard-bar" />
                   <div className="fcard-body">
-                    <div className="fcard-tag">{f.tag}</div>
+                    <div className="fcard-tag">{f.brand || "Flagship"}</div>
                     <h3>{f.name}</h3>
-                    <div className="fcard-sub">{f.sub}</div>
-                    <p>{f.desc}</p>
+                    <div className="fcard-sub">{f.location}</div>
+                    <p>{f.tagline}</p>
+                    <span style={{ color: "#fff", fontWeight: 700, fontSize: 14, marginTop: 12, display: "inline-block" }}>View event →</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
