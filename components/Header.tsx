@@ -16,6 +16,7 @@ export default function Header() {
         <nav className="nav-links">
           <AudienceMenu />
           <Link href="/events">Flagship Events</Link>
+          <Link href="/champions">Champions</Link>
           <Link href="/rankings">Rankings</Link>
           <Link href="/membership">Membership</Link>
           <Link href="/login">Log in</Link>
