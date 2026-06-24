@@ -84,13 +84,30 @@ export default async function LeaguePage({ params }: { params: Promise<{ slug: s
           </div>
         </section>
 
-        {/* STANDINGS TEASER */}
+        {/* STANDINGS */}
         <section className="pad steps-sec">
-          <div className="wrap" style={{ textAlign: "center" }}>
-            <div className="eyebrow">Standings</div>
-            <h2 style={{ fontSize: 26, fontWeight: 900, margin: "10px 0" }}>League table coming soon</h2>
-            <p style={{ color: "var(--muted)", maxWidth: 520, margin: "0 auto 18px" }}>Live standings update after each round, and roll up into the country, continent and world rankings.</p>
-            <Link className="btn btn-dark" href="/rankings">See global rankings</Link>
+          <div className="wrap" style={{ maxWidth: 880 }}>
+            <div className="sec-head"><div className="eyebrow">Standings</div><h2>{league.season} table</h2><p>Ranked by points — standings feed the country, continent and world rankings.</p></div>
+            {league.standings ? (
+              <div style={{ border: "1px solid var(--line)", borderRadius: 14, overflow: "hidden", background: "#fff" }}>
+                <div className="lstand-row lstand-head"><span>#</span><span>Team</span><span>G</span><span>W</span><span>L</span><span>T</span><span>Diff</span><span>Pct</span><span>Pts</span></div>
+                {[...league.standings].sort((a, b) => b.pts - a.pts || b.pct - a.pct).map((s, i) => (
+                  <div className="lstand-row" key={s.team}>
+                    <span style={{ fontWeight: 800, color: i < 3 ? "#b8860b" : "var(--muted)" }}>{i + 1}</span>
+                    <span style={{ fontWeight: 700 }}>{s.team}</span>
+                    <span>{s.g}</span><span>{s.w}</span><span>{s.l}</span><span>{s.t}</span>
+                    <span style={{ color: s.rd >= 0 ? "#138a45" : "#b3261e" }}>{s.rd >= 0 ? "+" : ""}{s.rd}</span>
+                    <span>{s.pct.toFixed(3).replace(/^0/, "")}</span>
+                    <span style={{ fontWeight: 800 }}>{Number.isInteger(s.pts) ? s.pts : s.pts.toFixed(1)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: "var(--muted)" }}>League table coming soon — it updates after each round.</p>
+            )}
+            <p style={{ color: "var(--muted)", fontSize: 12.5, marginTop: 14 }}>
+              <Link href="/rankings" style={{ color: "var(--navy)", fontWeight: 700 }}>See global rankings →</Link>
+            </p>
           </div>
         </section>
       </main>
