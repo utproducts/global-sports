@@ -242,8 +242,8 @@ export default function OrganizerManage({ id }: { id: string }) {
           </div>
         )}
 
-        <div style={{ marginTop: 30, display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <span className="champ-pill" style={{ background: "#eef1f6", color: "#5b6675" }}>Bracket builder — coming next</span>
+        <div style={{ marginTop: 30, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <Link className="btn btn-dark" href={`/organizer/${id}/schedule`}>Schedule, standings &amp; bracket →</Link>
           <span className="champ-pill" style={{ background: "#eef1f6", color: "#5b6675" }}>Live results — coming next</span>
           <span className="champ-pill" style={{ background: "#eef1f6", color: "#5b6675" }}>eLineUp — coming next</span>
         </div>
