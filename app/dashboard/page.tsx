@@ -30,8 +30,8 @@ const ROLE_MODULES: Record<string, Module> = {
     { label: "Team rankings", href: "/rankings" },
   ] },
   organizer: { title: "Event Organizer", links: [
-    { label: "Create an event", href: "#", soon: true },
-    { label: "Manage my events", href: "#", soon: true },
+    { label: "Create a tournament", href: "/organizer/new" },
+    { label: "My tournaments", href: "/organizer" },
     { label: "Flagship programs", href: "/events" },
   ] },
   league: { title: "League Operator", links: [

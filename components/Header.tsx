@@ -1,6 +1,5 @@
 import Link from "next/link";
-import CountrySwitcher from "./CountrySwitcher";
-import AudienceMenu from "./AudienceMenu";
+import MainNav from "./MainNav";
 
 export default function Header() {
   return (
@@ -13,15 +12,7 @@ export default function Header() {
             GLOBAL SPORTS<small>CHAMPIONSHIP PROGRAM</small>
           </div>
         </Link>
-        <nav className="nav-links">
-          <AudienceMenu />
-          <Link href="/events">Flagship Events</Link>
-          <Link href="/champions">Champions</Link>
-          <Link href="/rankings">Rankings</Link>
-          <Link href="/membership">Membership</Link>
-          <Link href="/login">Log in</Link>
-          <CountrySwitcher />
-        </nav>
+        <MainNav />
       </div>
     </header>
   );

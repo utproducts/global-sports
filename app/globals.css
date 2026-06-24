@@ -282,6 +282,19 @@ footer.site{background:var(--navy);color:rgba(255,255,255,.65);padding:54px 0 36
 .champ-tags{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
 .champ-flag{font-size:16px}
 .champ-pill{font-size:11px;font-weight:800;letter-spacing:.3px;background:var(--bg);color:#33404f;padding:4px 9px;border-radius:999px}
+.std-table{width:100%;border-collapse:collapse;font-size:14px}
+.std-table th{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:center;border-bottom:2px solid var(--line)}
+.std-table td{padding:11px 12px;text-align:center;border-bottom:1px solid var(--line)}
+.std-table tbody tr:hover{background:#fafbfd}
+/* language switcher */
+.lang-switch{position:relative}
+.lang-btn{display:flex;align-items:center;gap:6px;background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;font-family:inherit;font-size:13px;font-weight:600;padding:6px 10px;border-radius:8px;cursor:pointer}
+.lang-btn:hover{background:rgba(255,255,255,.1)}
+.lang-caret{font-size:10px;opacity:.8}
+.lang-menu{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(10,22,40,.16);padding:6px;min-width:160px;z-index:50}
+.lang-item{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:none;font-family:inherit;font-size:14px;color:var(--ink);padding:9px 10px;border-radius:7px;cursor:pointer}
+.lang-item:hover{background:var(--bg)}
+.lang-item.on{font-weight:800;background:#fff8df}
 
 /* FLAGSHIP EVENT LANDING */
 .fl-hero{background-size:cover;background-position:center;color:#fff;padding:92px 0 58px}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { I18nProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Global Sports — World Slow-Pitch Championship Program",
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"
         />
       </head>
-      <body>{children}</body>
+      <body><I18nProvider>{children}</I18nProvider></body>
     </html>
   );
 }
