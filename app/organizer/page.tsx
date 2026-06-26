@@ -61,7 +61,10 @@ export default function OrganizerHome() {
             <h1 style={{ fontSize: 32, fontWeight: 900, margin: "8px 0 4px" }}>Your tournaments</h1>
             <p style={{ color: "var(--muted)" }}>Create events, manage registrations, reserve slots, and invoice teams.</p>
           </div>
-          <Link className="btn btn-primary" href="/organizer/new">+ Create tournament</Link>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Link className="btn btn-ghost" href="/organizer/waivers">Fee waivers</Link>
+            <Link className="btn btn-primary" href="/organizer/new">+ Create tournament</Link>
+          </div>
         </div>
 
         <div style={{ marginTop: 28 }}>

@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { VAT, byCode } from "@/lib/countries";
 import { supabase } from "@/lib/supabase";
-
-const TIER_ENUM: Record<string, string> = { standard: "standard", select: "premier", elite: "elite" };
-const TIER_LABEL: Record<string, string> = { standard: "Standard", select: "Select", elite: "Elite" };
-const PRICE: Record<string, number> = { standard: 30, select: 45, elite: 75 };
+import { rateFor, regionKeyForCountry, type Tier, type RegionRate } from "@/lib/membership";
+import { bestWaiver, type Waiver } from "@/lib/waivers";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [plan, setPlan] = useState("select");
+  const [plan, setPlan] = useState("");
   const [country, setCountry] = useState("DE");
+  const [tiers, setTiers] = useState<Tier[]>([]);
+  const [rates, setRates] = useState<RegionRate[]>([]);
+  const [waivers, setWaivers] = useState<Waiver[]>([]);
+  const [code, setCode] = useState("");
   const [signedInEmail, setSignedInEmail] = useState<string | null>(null);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -23,15 +25,26 @@ export default function CheckoutPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState<"" | "active" | "confirm">("");
+  const [done, setDone] = useState<"" | "confirm">("");
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const pl = p.get("plan"); const co = p.get("country");
-    if (pl && PRICE[pl]) setPlan(pl);
     if (co && byCode[co.toUpperCase()]) setCountry(co.toUpperCase());
     (async () => {
-      const { data: { session } } = (await supabase?.auth.getSession()) ?? { data: { session: null } };
+      if (!supabase) return;
+      const [{ data: t }, { data: r }, { data: w }, sess] = await Promise.all([
+        supabase.from("membership_tiers").select("id,label,price_eur,is_popular,sort_order,features,access,description,ipr_tier").eq("is_active", true).order("sort_order"),
+        supabase.from("membership_region_rates").select("tier_id,region_key,price,active").eq("active", true),
+        supabase.from("fee_waivers").select("*").eq("active", true).in("applies_to", ["membership", "both"]),
+        supabase.auth.getSession(),
+      ]);
+      const list = (t as Tier[]) ?? [];
+      setTiers(list);
+      setRates((r as RegionRate[]) ?? []);
+      setWaivers((w as Waiver[]) ?? []);
+      setPlan(pl && list.some((x) => x.id === pl) ? pl : (list.find((x) => x.is_popular)?.id ?? list[0]?.id ?? ""));
+      const session = sess.data.session;
       if (session) {
         setSignedInEmail(session.user.email ?? "");
         const md = session.user.user_metadata || {};
@@ -44,19 +57,27 @@ export default function CheckoutPage() {
   const entry = byCode[country];
   const cur = entry?.country.cur ?? "EUR";
   const vat = VAT[country] ?? 0;
-  const base = PRICE[plan];
-  const vatAmt = +(base * vat).toFixed(2);
-  const total = +(base + vatAmt).toFixed(2);
+  const tier = tiers.find((t) => t.id === plan);
+  const base = tier ? rateFor(tier, country, rates) : 0;
+
+  const applied = useMemo(() => {
+    if (!tier) return null;
+    return bestWaiver(waivers, { applies_to: "membership", regionKey: regionKeyForCountry(country), countryCode: country, code }, base);
+  }, [waivers, tier, country, code, base]);
+
+  const discount = applied?.discount ?? 0;
+  const discounted = +(base - discount).toFixed(2);
+  const vatAmt = +(discounted * vat).toFixed(2);
+  const total = +(discounted + vatAmt).toFixed(2);
 
   async function activate() {
     setError("");
     if (!supabase) { setError("Backend not configured."); return; }
+    if (!tier) { setError("Select a membership."); return; }
     if (!first.trim() || !last.trim()) { setError("Please enter your name."); return; }
     setBusy(true);
     try {
-      // 1) Ensure an authenticated user
-      let userId: string | undefined;
-      let hasSession = false;
+      let userId: string | undefined; let hasSession = false;
       const { data: { session } } = await supabase.auth.getSession();
       if (session) { userId = session.user.id; hasSession = true; }
       else {
@@ -67,64 +88,48 @@ export default function CheckoutPage() {
       }
       if (!userId) throw new Error("Could not establish an account.");
 
-      // 2) Country id
       const { data: countryRow } = await supabase.from("countries").select("id").eq("code", country).maybeSingle();
       const cid = (countryRow as { id?: string } | null)?.id ?? null;
 
-      // 3) Find or create the player profile
       const useEmail = hasSession ? (signedInEmail || email) : email;
-      let { data: prof } = await supabase.from("users").select("id").eq("supabase_auth_id", userId).maybeSingle();
+      const { data: prof } = await supabase.from("users").select("id").eq("supabase_auth_id", userId).maybeSingle();
       let playerId = (prof as { id?: string } | null)?.id;
       if (!playerId) {
         const { data: inserted, error: insErr } = await supabase
-          .from("users")
-          .insert({ email: useEmail, first_name: first, last_name: last, role: "player", country_id: cid, supabase_auth_id: userId })
+          .from("users").insert({ email: useEmail, first_name: first, last_name: last, role: "player", country_id: cid, supabase_auth_id: userId })
           .select("id").single();
         if (insErr) throw insErr;
         playerId = (inserted as { id: string }).id;
       }
 
-      // 4) Skip if already has an active membership
-      const { data: existing } = await supabase
-        .from("ipr_memberships").select("id").eq("player_id", playerId).eq("status", "active").maybeSingle();
-
+      const { data: existing } = await supabase.from("ipr_memberships").select("id").eq("player_id", playerId).eq("status", "active").maybeSingle();
       if (!existing) {
-        const now = new Date();
-        const exp = new Date(now); exp.setFullYear(exp.getFullYear() + 1);
+        const now = new Date(); const exp = new Date(now); exp.setFullYear(exp.getFullYear() + 1);
         const { error: mErr } = await supabase.from("ipr_memberships").insert({
-          player_id: playerId,
-          tier: TIER_ENUM[plan],
-          status: "active",                 // TEST: bypasses Stripe payment
-          price_paid: base,
-          currency: cur,
-          vat_amount: vatAmt,
-          vat_rate: vat,
-          country_id: cid,
-          activated_at: now.toISOString(),
-          expires_at: exp.toISOString(),
-          duration_type: "annual",
-          duration_years: 1,
+          player_id: playerId, tier: tier.ipr_tier, status: "active",   // TEST: bypasses Stripe
+          price_paid: discounted, discount_amount: discount, waiver_id: applied?.waiver.id ?? null,
+          currency: cur, vat_amount: vatAmt, vat_rate: vat, country_id: cid,
+          activated_at: now.toISOString(), expires_at: exp.toISOString(), duration_type: "annual", duration_years: 1,
         });
         if (mErr) throw mErr;
+        if (applied?.waiver) {
+          await supabase.from("fee_waivers").update({ redeemed_count: applied.waiver.redeemed_count + 1 }).eq("id", applied.waiver.id);
+        }
       }
-
-      if (hasSession) { router.push("/dashboard"); }
-      else { setDone("confirm"); }
+      if (hasSession) router.push("/dashboard"); else setDone("confirm");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   }
 
   if (done === "confirm") {
-    return (
-      <><Header /><main className="auth-wrap"><div className="auth-card">
-        <h1>Membership activated 🎉</h1>
-        <p className="auth-sub">Your {TIER_LABEL[plan]} membership is active. We&apos;ve created your account — if email confirmation is on, verify your inbox, then <Link href="/login">log in</Link> to see your dashboard.</p>
-      </div></main><Footer /></>
-    );
+    return (<><Header /><main className="auth-wrap"><div className="auth-card">
+      <h1>Membership activated 🎉</h1>
+      <p className="auth-sub">Your {tier?.label} IPM is active. We&apos;ve created your account — if email confirmation is on, verify your inbox, then <Link href="/login">log in</Link>.</p>
+    </div></main><Footer /></>);
   }
+
+  const vatPct = (vat * 100).toFixed(vat * 100 % 1 ? 1 : 0);
 
   return (
     <>
@@ -135,20 +140,28 @@ export default function CheckoutPage() {
             <Link className="back" href={`/membership?country=${country}`}>← Membership</Link>
             <div className="eyebrow" style={{ color: "var(--gold)" }}>Checkout</div>
             <h1>Confirm your membership</h1>
-            <p className="sub">{entry?.country.f} {entry?.country.n} · {TIER_LABEL[plan]} · billed in {cur}</p>
+            <p className="sub">{entry?.country.f} {entry?.country.n} · {tier?.label ?? "—"} IPM · billed in {cur}</p>
           </div>
         </section>
 
         <section className="pad">
           <div className="wrap" style={{ maxWidth: 560 }}>
-            {/* Order summary */}
             <div style={{ border: "1.5px solid var(--line)", borderRadius: 16, padding: 22, marginBottom: 26 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 6 }}><span>{TIER_LABEL[plan]} membership (1 yr)</span><span>€{base.toFixed(2)}</span></div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--muted)", marginBottom: 6 }}><span>VAT ({(vat * 100).toFixed(vat * 100 % 1 ? 1 : 0)}%)</span><span>€{vatAmt.toFixed(2)}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 6 }}><span>{tier?.label ?? "—"} IPM (1 yr)</span><span>€{base.toFixed(2)}</span></div>
+              {discount > 0 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "#138a45", marginBottom: 6 }}>
+                  <span>Waiver — {applied?.waiver.label}</span><span>−€{discount.toFixed(2)}</span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--muted)", marginBottom: 6 }}><span>VAT ({vatPct}%)</span><span>€{vatAmt.toFixed(2)}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 900, fontSize: 18, borderTop: "1px solid var(--line)", paddingTop: 8, marginTop: 4 }}><span>Total</span><span>€{total.toFixed(2)}{cur !== "EUR" ? ` (${cur})` : ""}</span></div>
+              <div style={{ marginTop: 14, display: "flex", gap: 8, alignItems: "center" }}>
+                <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Discount / waiver code"
+                  style={{ flex: 1, padding: "10px 12px", border: "1.5px solid var(--line)", borderRadius: 8, fontFamily: "inherit", fontSize: 14 }} />
+                {code && (discount > 0 ? <span style={{ color: "#138a45", fontSize: 13, fontWeight: 700 }}>Applied ✓</span> : <span style={{ color: "var(--muted)", fontSize: 13 }}>No match</span>)}
+              </div>
             </div>
 
-            {/* Account */}
             <div className="auth-card" style={{ boxShadow: "none", border: "1.5px solid var(--line)", maxWidth: "none", padding: 22 }}>
               <h1 style={{ fontSize: 18, textAlign: "left" }}>{signedInEmail ? "Your details" : "Create your account"}</h1>
               <form onSubmit={(e) => { e.preventDefault(); activate(); }}>
@@ -166,12 +179,10 @@ export default function CheckoutPage() {
                 )}
                 {error && <div className="auth-error">{error}</div>}
                 <button className="btn btn-primary" type="submit" disabled={busy} style={{ width: "100%", justifyContent: "center", marginTop: 6 }}>
-                  {busy ? "Activating…" : `Skip payment & activate (TEST) — €${total.toFixed(2)}`}
+                  {busy ? "Activating…" : total === 0 ? "Activate free membership" : `Skip payment & activate (TEST) — €${total.toFixed(2)}`}
                 </button>
               </form>
-              <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 12 }}>
-                🧪 Test mode: this activates the membership without charging. Stripe checkout replaces this button later.
-              </p>
+              <p style={{ fontSize: 12, color: "var(--muted)", marginTop: 12 }}>🧪 Test mode: activates without charging. Stripe checkout replaces this later.</p>
             </div>
           </div>
         </section>

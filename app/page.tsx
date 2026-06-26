@@ -95,13 +95,13 @@ export default function Home() {
               <span className="mem-note">🔔 {c.memNote}</span>
             </div>
             <div className="grid tiers">
-              {[0, 1, 2].map((i) => {
-                const prices = ["€30", "€45", "€75"];
+              {c.tierNames.map((name, i) => {
+                const popular = i === c.tierNames.length - 1;
                 return (
-                  <div key={i} className={"tier" + (i === 1 ? " pop" : "")}>
-                    {i === 1 && <div className="pill">{c.popular}</div>}
-                    <h3>{c.tierNames[i]}</h3>
-                    <div className="price">{prices[i]}<span>{c.perYr}</span></div>
+                  <div key={i} className={"tier" + (popular ? " pop" : "")}>
+                    {popular && <div className="pill">{c.popular}</div>}
+                    <h3>{name}</h3>
+                    <div className="price">{c.tierPrices[i]}<span>{c.perYr}</span></div>
                     <div className="cur">{c.cur}</div>
                     <ul>{c.tierFeatures[i].map((f, j) => <li key={j}>{f}</li>)}</ul>
                   </div>

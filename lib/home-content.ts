@@ -10,7 +10,7 @@ export type HomeCopy = {
   audEyebrow: string; audH2: string; aud: Card[];
   howEyebrow: string; howH2: string; steps: Card[];
   memEyebrow: string; memH2: string; memNote: string; perYr: string; cur: string; popular: string;
-  tierNames: [string, string, string]; tierFeatures: [string[], string[], string[]]; choose: string;
+  tierNames: string[]; tierPrices: string[]; tierFeatures: string[][]; choose: string;
 };
 
 const en: HomeCopy = {
@@ -43,11 +43,11 @@ const en: HomeCopy = {
   memEyebrow: "Membership", memH2: "One membership. Valid everywhere.",
   memNote: "Buy once — play in any Global Sports country, no second fee",
   perYr: "/yr", cur: "Charged in your local currency + VAT", popular: "MOST POPULAR",
-  tierNames: ["Standard", "Select", "Elite"],
+  tierNames: ["League", "Tournament"],
+  tierPrices: ["€10", "€20"],
   tierFeatures: [
-    ["Required to register & play", "Player profile & rating", "Roster eligibility"],
-    ["Everything in Standard", "Priority event registration", "Enhanced stats & history"],
-    ["Everything in Select", "Premium membership card", "Early access to championships"],
+    ["Eligible for league rosters", "Global player ID & profile", "Counts toward the Global ranking"],
+    ["Everything in League", "Tournament & qualifier eligibility", "Full Global ranking points"],
   ],
   choose: "Choose your membership →",
 };
@@ -82,11 +82,11 @@ const es: HomeCopy = {
   memEyebrow: "Membresía", memH2: "Una membresía. Válida en todas partes.",
   memNote: "Compra una vez: juega en cualquier país de Global Sports, sin segunda cuota",
   perYr: "/año", cur: "Cobrado en tu moneda local + IVA", popular: "MÁS POPULAR",
-  tierNames: ["Standard", "Select", "Elite"],
+  tierNames: ["Liga", "Torneo"],
+  tierPrices: ["€10", "€20"],
   tierFeatures: [
-    ["Obligatoria para registrarse y jugar", "Perfil y valoración del jugador", "Elegibilidad para róster"],
-    ["Todo lo de Standard", "Registro prioritario a eventos", "Estadísticas e historial mejorados"],
-    ["Todo lo de Select", "Tarjeta de membresía premium", "Acceso anticipado a campeonatos"],
+    ["Elegible para rosters de liga", "ID y perfil global de jugador", "Cuenta para la clasificación global"],
+    ["Todo lo de Liga", "Elegibilidad para torneos y clasificatorios", "Puntos completos de clasificación global"],
   ],
   choose: "Elige tu membresía →",
 };
@@ -121,11 +121,11 @@ const it: HomeCopy = {
   memEyebrow: "Iscrizione", memH2: "Un'iscrizione. Valida ovunque.",
   memNote: "Acquista una volta: gioca in qualsiasi paese Global Sports, senza una seconda quota",
   perYr: "/anno", cur: "Addebitato nella tua valuta locale + IVA", popular: "PIÙ POPOLARE",
-  tierNames: ["Standard", "Select", "Elite"],
+  tierNames: ["Campionato", "Torneo"],
+  tierPrices: ["€10", "€20"],
   tierFeatures: [
-    ["Obbligatoria per iscriversi e giocare", "Profilo e valutazione del giocatore", "Idoneità al roster"],
-    ["Tutto di Standard", "Iscrizione prioritaria agli eventi", "Statistiche e storico avanzati"],
-    ["Tutto di Select", "Tessera d'iscrizione premium", "Accesso anticipato ai campionati"],
+    ["Idoneità ai roster di campionato", "ID e profilo globale del giocatore", "Conta per la classifica globale"],
+    ["Tutto di Campionato", "Idoneità a tornei e qualificazioni", "Punti pieni della classifica globale"],
   ],
   choose: "Scegli la tua iscrizione →",
 };
@@ -160,11 +160,11 @@ const de: HomeCopy = {
   memEyebrow: "Mitgliedschaft", memH2: "Eine Mitgliedschaft. Überall gültig.",
   memNote: "Einmal kaufen – in jedem Global-Sports-Land spielen, ohne zweite Gebühr",
   perYr: "/Jahr", cur: "Abrechnung in deiner lokalen Währung + MwSt.", popular: "AM BELIEBTESTEN",
-  tierNames: ["Standard", "Select", "Elite"],
+  tierNames: ["Liga", "Turnier"],
+  tierPrices: ["€10", "€20"],
   tierFeatures: [
-    ["Erforderlich zum Anmelden & Spielen", "Spielerprofil & Bewertung", "Kader-Berechtigung"],
-    ["Alles aus Standard", "Bevorzugte Event-Anmeldung", "Erweiterte Statistiken & Verlauf"],
-    ["Alles aus Select", "Premium-Mitgliedskarte", "Früher Zugang zu Meisterschaften"],
+    ["Berechtigt für Liga-Kader", "Globale Spieler-ID & Profil", "Zählt für die globale Rangliste"],
+    ["Alles aus Liga", "Turnier- & Qualifikations-Berechtigung", "Volle globale Ranglistenpunkte"],
   ],
   choose: "Wähle deine Mitgliedschaft →",
 };
