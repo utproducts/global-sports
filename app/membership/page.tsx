@@ -14,6 +14,7 @@ export default function MembershipPage() {
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [rates, setRates] = useState<RegionRate[]>([]);
   const [tier, setTier] = useState("");
+  const [years, setYears] = useState(1);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +38,8 @@ export default function MembershipPage() {
   const cur = entry?.country.cur ?? "EUR";
   const vat = VAT[country] ?? 0;
   const selected = tiers.find((t) => t.id === tier);
-  const base = selected ? rateFor(selected, country, rates) : 0;
+  const unit = selected ? rateFor(selected, country, rates) : 0;
+  const base = unit * years;
   const vatAmt = base * vat;
   const total = base + vatAmt;
   const money = (n: number) => `€${n.toFixed(2)}`;
@@ -45,7 +47,7 @@ export default function MembershipPage() {
   const regionLabel = REGIONS.find((r) => r.key === regionKeyForCountry(country))?.label;
 
   function onContinue() {
-    if (tier) router.push(`/membership/checkout?plan=${tier}&country=${country}`);
+    if (tier) router.push(`/membership/checkout?plan=${tier}&country=${country}&years=${years}`);
   }
 
   return (
@@ -112,10 +114,17 @@ export default function MembershipPage() {
               <div style={{ marginTop: 34, padding: 24, border: "1.5px solid var(--line)", borderRadius: 16, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
                 <div>
                   <div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 700 }}>{selected.label} IPM · {entry?.country.f} {entry?.country.n}</div>
-                  <div style={{ fontSize: 26, fontWeight: 900 }}>{money(total)} <span style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)" }}>/yr</span></div>
-                  <div style={{ fontSize: 12, color: "var(--muted)" }}>{money(base)} + {money(vatAmt)} VAT{cur !== "EUR" ? ` · charged in ${cur}` : ""}</div>
+                  <div style={{ fontSize: 26, fontWeight: 900 }}>{money(total)} <span style={{ fontSize: 14, fontWeight: 600, color: "var(--muted)" }}>{years > 1 ? `/ ${years} yrs` : "/yr"}</span></div>
+                  <div style={{ fontSize: 12, color: "var(--muted)" }}>{money(unit)}/yr × {years} + {money(vatAmt)} VAT{cur !== "EUR" ? ` · charged in ${cur}` : ""}</div>
                 </div>
-                <button className="btn btn-primary" onClick={onContinue} style={{ padding: "14px 28px" }}>Continue →</button>
+                <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: "#33404f" }}>Duration{" "}
+                    <select value={years} onChange={(e) => setYears(Number(e.target.value))} style={{ padding: "10px 12px", border: "1.5px solid var(--line)", borderRadius: 9, fontFamily: "inherit", fontSize: 14, marginLeft: 6 }}>
+                      <option value={1}>1 year</option><option value={2}>2 years</option><option value={3}>3 years</option>
+                    </select>
+                  </label>
+                  <button className="btn btn-primary" onClick={onContinue} style={{ padding: "14px 28px" }}>Continue →</button>
+                </div>
               </div>
             )}
             <p style={{ color: "var(--muted)", fontSize: 12.5, marginTop: 12 }}>

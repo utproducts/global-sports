@@ -18,6 +18,8 @@ export default function CheckoutPage() {
   const [rates, setRates] = useState<RegionRate[]>([]);
   const [waivers, setWaivers] = useState<Waiver[]>([]);
   const [code, setCode] = useState("");
+  const [years, setYears] = useState(1);
+  const [autoRenew, setAutoRenew] = useState(false);
   const [signedInEmail, setSignedInEmail] = useState<string | null>(null);
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -29,8 +31,9 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
-    const pl = p.get("plan"); const co = p.get("country");
+    const pl = p.get("plan"); const co = p.get("country"); const yr = Number(p.get("years"));
     if (co && byCode[co.toUpperCase()]) setCountry(co.toUpperCase());
+    if (yr === 2 || yr === 3) setYears(yr);
     (async () => {
       if (!supabase) return;
       const [{ data: t }, { data: r }, { data: w }, sess] = await Promise.all([
@@ -58,7 +61,8 @@ export default function CheckoutPage() {
   const cur = entry?.country.cur ?? "EUR";
   const vat = VAT[country] ?? 0;
   const tier = tiers.find((t) => t.id === plan);
-  const base = tier ? rateFor(tier, country, rates) : 0;
+  const unit = tier ? rateFor(tier, country, rates) : 0;
+  const base = +(unit * years).toFixed(2);
 
   const applied = useMemo(() => {
     if (!tier) return null;
@@ -104,12 +108,13 @@ export default function CheckoutPage() {
 
       const { data: existing } = await supabase.from("ipr_memberships").select("id").eq("player_id", playerId).eq("status", "active").maybeSingle();
       if (!existing) {
-        const now = new Date(); const exp = new Date(now); exp.setFullYear(exp.getFullYear() + 1);
+        const now = new Date(); const exp = new Date(now); exp.setFullYear(exp.getFullYear() + years);
         const { error: mErr } = await supabase.from("ipr_memberships").insert({
           player_id: playerId, tier: tier.ipr_tier, status: "active",   // TEST: bypasses Stripe
           price_paid: discounted, discount_amount: discount, waiver_id: applied?.waiver.id ?? null,
           currency: cur, vat_amount: vatAmt, vat_rate: vat, country_id: cid,
-          activated_at: now.toISOString(), expires_at: exp.toISOString(), duration_type: "annual", duration_years: 1,
+          activated_at: now.toISOString(), expires_at: exp.toISOString(),
+          duration_type: years > 1 ? "multi_year" : "annual", duration_years: years, auto_renew: autoRenew,
         });
         if (mErr) throw mErr;
         if (applied?.waiver) {
@@ -147,7 +152,7 @@ export default function CheckoutPage() {
         <section className="pad">
           <div className="wrap" style={{ maxWidth: 560 }}>
             <div style={{ border: "1.5px solid var(--line)", borderRadius: 16, padding: 22, marginBottom: 26 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 6 }}><span>{tier?.label ?? "—"} IPM (1 yr)</span><span>€{base.toFixed(2)}</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 6 }}><span>{tier?.label ?? "—"} IPM ({years} yr{years > 1 ? "s" : ""})</span><span>€{base.toFixed(2)}</span></div>
               {discount > 0 && (
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "#138a45", marginBottom: 6 }}>
                   <span>Waiver — {applied?.waiver.label}</span><span>−€{discount.toFixed(2)}</span>
@@ -160,6 +165,10 @@ export default function CheckoutPage() {
                   style={{ flex: 1, padding: "10px 12px", border: "1.5px solid var(--line)", borderRadius: 8, fontFamily: "inherit", fontSize: 14 }} />
                 {code && (discount > 0 ? <span style={{ color: "#138a45", fontSize: 13, fontWeight: 700 }}>Applied ✓</span> : <span style={{ color: "var(--muted)", fontSize: 13 }}>No match</span>)}
               </div>
+              <label style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "#33404f" }}>
+                <input type="checkbox" checked={autoRenew} onChange={(e) => setAutoRenew(e.target.checked)} />
+                Auto-renew my membership when it expires ({years > 1 ? `every ${years} years` : "yearly"})
+              </label>
             </div>
 
             <div className="auth-card" style={{ boxShadow: "none", border: "1.5px solid var(--line)", maxWidth: "none", padding: 22 }}>
