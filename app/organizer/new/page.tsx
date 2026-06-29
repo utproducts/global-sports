@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import { AGE_GROUPS, CLASSES, CURRENCIES, slugify } from "@/lib/org";
 import { roleLabel, type Stature } from "@/lib/statures";
+import { canCreateStature, directorRank, tierForRank } from "@/lib/permissions";
 
 type Country = { id: string; name: string; code: string };
 
@@ -20,6 +21,7 @@ export default function NewTournament() {
   const [uid, setUid] = useState<string | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [statures, setStatures] = useState<Stature[]>([]);
+  const [rank, setRank] = useState(1);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -38,8 +40,16 @@ export default function NewTournament() {
       if (!supabase) { setAuthReady(true); return; }
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { router.push("/login"); return; }
-      const { data: prof } = await supabase.from("users").select("id").eq("supabase_auth_id", session.user.id).maybeSingle();
-      setUid((prof as { id?: string } | null)?.id ?? null);
+      const { data: prof } = await supabase.from("users").select("id,role").eq("supabase_auth_id", session.user.id).maybeSingle();
+      const p = prof as { id?: string; role?: string } | null;
+      setUid(p?.id ?? null);
+      const metaRoles = (session.user.user_metadata?.roles as string[] | undefined) ?? [];
+      let drRoles: string[] = [];
+      if (p?.id) {
+        const { data: dr } = await supabase.from("director_roles").select("role").eq("user_id", p.id).eq("is_active", true);
+        drRoles = ((dr as { role: string }[] | null) ?? []).map((x) => x.role);
+      }
+      setRank(directorRank([p?.role, ...metaRoles, ...drRoles]));
       const [{ data: cs }, { data: st }] = await Promise.all([
         supabase.from("countries").select("id,name,code").order("name"),
         supabase.from("event_statures").select("*").eq("is_active", true).in("region_scope", ["europe", "global"]).order("display_order"),
@@ -57,6 +67,7 @@ export default function NewTournament() {
     if (!f.country_id) { setError("Choose a country."); return; }
     if (!f.start_date || !f.end_date) { setError("Set start and end dates."); return; }
     if (Number(f.reserved_slots) > Number(f.max_teams)) { setError("Reserved slots can't exceed total capacity."); return; }
+    const needsApproval = !!stature && !canCreateStature(rank, stature.min_role);
     setBusy(true);
     const { data, error: err } = await supabase.from("tournaments").insert({
       name: f.name,
@@ -75,7 +86,8 @@ export default function NewTournament() {
       team_fee: Number(f.team_fee),
       currency: f.currency,
       ipr_required: f.ipr_required,
-      status: f.status,
+      status: needsApproval ? "draft" : f.status,
+      approval_required: needsApproval,
       notes: f.notes || null,
       created_by: uid,
       director_id: uid,
@@ -94,7 +106,8 @@ export default function NewTournament() {
       <main className="wrap" style={{ maxWidth: 720, padding: "44px 24px" }}>
         <Link className="back" href="/organizer" style={{ color: "var(--navy)" }}>← Your tournaments</Link>
         <h1 style={{ fontSize: 28, fontWeight: 900, margin: "10px 0 4px" }}>Create a tournament</h1>
-        <p style={{ color: "var(--muted)", marginBottom: 24 }}>Set the basics now — you can fine-tune brackets, schedule and lineups later.</p>
+        <p style={{ color: "var(--muted)", marginBottom: 8 }}>Set the basics now — you can fine-tune brackets, schedule and lineups later.</p>
+        <p style={{ fontSize: 13, marginBottom: 24 }}>Your access level: <strong style={{ color: "var(--navy)" }}>{tierForRank(rank).label}</strong> — {tierForRank(rank).scope}.</p>
 
         <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div className="card">
@@ -138,8 +151,13 @@ export default function NewTournament() {
               setF((prev) => ({ ...prev, stature_id: e.target.value, ipr_required: s ? s.ipm_required : prev.ipr_required }));
             }}>
               <option value="">Select a stature…</option>
-              {statures.map((s) => <option key={s.id} value={s.id}>{s.name}{s.ipm_required ? " · IPM required" : ""}</option>)}
+              {statures.map((s) => <option key={s.id} value={s.id}>{s.name}{s.ipm_required ? " · IPM required" : ""}{canCreateStature(rank, s.min_role) ? "" : " · needs approval"}</option>)}
             </select>
+            {stature && !canCreateStature(rank, stature.min_role) && (
+              <div style={{ marginTop: 10, fontSize: 13, background: "#fff4e0", color: "#8a6300", padding: "9px 12px", borderRadius: 8 }}>
+                This stature requires <strong>{roleLabel(stature.min_role)}</strong> approval. You can create it, but it will be saved as a <strong>draft pending review</strong> rather than published directly.
+              </div>
+            )}
             {stature && (
               <div style={{ marginTop: 10, fontSize: 13, color: "var(--muted)", display: "flex", gap: 14, flexWrap: "wrap" }}>
                 <span>Points ×{stature.point_multiplier}</span>
