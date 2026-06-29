@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/lib/supabase";
 import { AGE_GROUPS, CLASSES, CURRENCIES, slugify } from "@/lib/org";
+import { roleLabel, type Stature } from "@/lib/statures";
 
 type Country = { id: string; name: string; code: string };
 
@@ -18,16 +19,18 @@ export default function NewTournament() {
   const [authReady, setAuthReady] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
+  const [statures, setStatures] = useState<Stature[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   const [f, setF] = useState({
     name: "", country_id: "", start_date: "", end_date: "",
     registration_closes_at: "", age_group: "Open", usssa_class: "AA",
-    max_teams: 16, reserved_slots: 0, min_teams: 4,
+    stature_id: "", max_teams: 16, reserved_slots: 0, min_teams: 4,
     team_fee: 0, currency: "EUR", ipr_required: false,
     status: "registration_open", notes: "",
   });
+  const stature = statures.find((s) => s.id === f.stature_id);
   const set = (k: string, v: string | number | boolean) => setF((s) => ({ ...s, [k]: v }));
 
   useEffect(() => {
@@ -37,8 +40,12 @@ export default function NewTournament() {
       if (!session) { router.push("/login"); return; }
       const { data: prof } = await supabase.from("users").select("id").eq("supabase_auth_id", session.user.id).maybeSingle();
       setUid((prof as { id?: string } | null)?.id ?? null);
-      const { data: cs } = await supabase.from("countries").select("id,name,code").order("name");
+      const [{ data: cs }, { data: st }] = await Promise.all([
+        supabase.from("countries").select("id,name,code").order("name"),
+        supabase.from("event_statures").select("*").eq("is_active", true).in("region_scope", ["europe", "global"]).order("display_order"),
+      ]);
       if (cs) setCountries(cs as Country[]);
+      if (st) setStatures(st as Stature[]);
       setAuthReady(true);
     })();
   }, [router]);
@@ -58,6 +65,7 @@ export default function NewTournament() {
       sport: "softball",
       age_group: f.age_group,
       usssa_class: f.usssa_class,
+      stature_id: f.stature_id || null,
       start_date: f.start_date,
       end_date: f.end_date,
       registration_closes_at: f.registration_closes_at || null,
@@ -121,6 +129,24 @@ export default function NewTournament() {
               <div style={{ flex: "1 1 160px" }}><label style={lab}>End date</label><input type="date" style={inp} value={f.end_date} onChange={(e) => set("end_date", e.target.value)} required /></div>
               <div style={{ flex: "1 1 200px" }}><label style={lab}>Registration deadline</label><input type="datetime-local" style={inp} value={f.registration_closes_at} onChange={(e) => set("registration_closes_at", e.target.value)} /></div>
             </div>
+          </div>
+
+          <div className="card">
+            <label style={lab}>Event stature</label>
+            <select style={inp} value={f.stature_id} onChange={(e) => {
+              const s = statures.find((x) => x.id === e.target.value);
+              setF((prev) => ({ ...prev, stature_id: e.target.value, ipr_required: s ? s.ipm_required : prev.ipr_required }));
+            }}>
+              <option value="">Select a stature…</option>
+              {statures.map((s) => <option key={s.id} value={s.id}>{s.name}{s.ipm_required ? " · IPM required" : ""}</option>)}
+            </select>
+            {stature && (
+              <div style={{ marginTop: 10, fontSize: 13, color: "var(--muted)", display: "flex", gap: 14, flexWrap: "wrap" }}>
+                <span>Points ×{stature.point_multiplier}</span>
+                <span>Min role: <strong style={{ color: "var(--navy)" }}>{roleLabel(stature.min_role)}</strong></span>
+                <span>IPM: <strong style={{ color: stature.ipm_required ? "#8a6300" : "#138a45" }}>{stature.ipm_required ? `required${stature.ipm_cost ? ` · €${Number(stature.ipm_cost).toFixed(0)}` : ""}` : "not required"}</strong></span>
+              </div>
+            )}
           </div>
 
           <div className="card">
