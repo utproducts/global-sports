@@ -11,6 +11,9 @@ export type HomeCopy = {
   howEyebrow: string; howH2: string; steps: Card[];
   memEyebrow: string; memH2: string; memNote: string; perYr: string; cur: string; popular: string;
   tierNames: string[]; tierPrices: string[]; tierFeatures: string[][]; choose: string;
+  newsEyebrow: string; newsTitle: string;
+  eventsEyebrow: string; eventsTitle: string; eventsCta: string;
+  umpireEyebrow: string; umpireTitle: string; umpireBlurb: string; umpireCta: string;
 };
 
 const en: HomeCopy = {
@@ -50,6 +53,11 @@ const en: HomeCopy = {
     ["Everything in League", "Tournament & qualifier eligibility", "Full Global ranking points"],
   ],
   choose: "Choose your membership →",
+  newsEyebrow: "Latest", newsTitle: "News & announcements",
+  eventsEyebrow: "On the calendar", eventsTitle: "Featured events", eventsCta: "See all events →",
+  umpireEyebrow: "Officiating", umpireTitle: "Global Umpire Program",
+  umpireBlurb: "One standard for officials worldwide — training, certification and assignment across every Global Sports region.",
+  umpireCta: "Learn more →",
 };
 
 const es: HomeCopy = {
@@ -89,6 +97,11 @@ const es: HomeCopy = {
     ["Todo lo de Liga", "Elegibilidad para torneos y clasificatorios", "Puntos completos de clasificación global"],
   ],
   choose: "Elige tu membresía →",
+  newsEyebrow: "Lo último", newsTitle: "Noticias y anuncios",
+  eventsEyebrow: "En el calendario", eventsTitle: "Eventos destacados", eventsCta: "Ver todos los eventos →",
+  umpireEyebrow: "Arbitraje", umpireTitle: "Programa Global de Árbitros",
+  umpireBlurb: "Un estándar para los árbitros de todo el mundo: formación, certificación y asignación en cada región de Global Sports.",
+  umpireCta: "Saber más →",
 };
 
 const it: HomeCopy = {
@@ -128,6 +141,11 @@ const it: HomeCopy = {
     ["Tutto di Campionato", "Idoneità a tornei e qualificazioni", "Punti pieni della classifica globale"],
   ],
   choose: "Scegli la tua iscrizione →",
+  newsEyebrow: "Ultime", newsTitle: "Notizie e annunci",
+  eventsEyebrow: "In calendario", eventsTitle: "Eventi in evidenza", eventsCta: "Vedi tutti gli eventi →",
+  umpireEyebrow: "Arbitraggio", umpireTitle: "Programma Globale Arbitri",
+  umpireBlurb: "Uno standard per gli arbitri di tutto il mondo: formazione, certificazione e assegnazione in ogni regione di Global Sports.",
+  umpireCta: "Scopri di più →",
 };
 
 const de: HomeCopy = {
@@ -167,6 +185,11 @@ const de: HomeCopy = {
     ["Alles aus Liga", "Turnier- & Qualifikations-Berechtigung", "Volle globale Ranglistenpunkte"],
   ],
   choose: "Wähle deine Mitgliedschaft →",
+  newsEyebrow: "Aktuelles", newsTitle: "News & Ankündigungen",
+  eventsEyebrow: "Im Kalender", eventsTitle: "Ausgewählte Events", eventsCta: "Alle Events ansehen →",
+  umpireEyebrow: "Schiedsrichter", umpireTitle: "Globales Schiedsrichter-Programm",
+  umpireBlurb: "Ein Standard für Schiedsrichter weltweit — Ausbildung, Zertifizierung und Einsatz in jeder Global-Sports-Region.",
+  umpireCta: "Mehr erfahren →",
 };
 
 export const HOME: Record<Lang, HomeCopy> = { en, es, it, de };
