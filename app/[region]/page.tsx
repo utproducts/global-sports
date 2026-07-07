@@ -99,14 +99,8 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
         {/* REGION OVERVIEW */}
         <section className="pad">
           <div className="wrap">
-            <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
-              <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{tournamentCount}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Tournaments</div></div>
-              <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{countries.length}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Countries</div></div>
-              <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{activeCount}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Active countries</div></div>
-            </div>
-
-            {/* Featured events banner */}
-            <div style={{ marginTop: 26 }}>
+            {/* Featured event banner — above the stats */}
+            <div>
               {events.length === 0 ? (
                 <div className="feat-banner">
                   <div style={{ flex: "1 1 340px" }}>
@@ -134,6 +128,12 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
               )}
             </div>
 
+            <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14, marginTop: 26 }}>
+              <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{tournamentCount}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Tournaments</div></div>
+              <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{countries.length}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Countries</div></div>
+              <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{activeCount}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Active countries</div></div>
+            </div>
+
             {/* Latest news photo cards */}
             {news.length > 0 && (
               <div style={{ marginTop: 42 }}>
@@ -151,28 +151,6 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
                 </div>
               </div>
             )}
-          </div>
-        </section>
-
-        <section className="pad" style={{ paddingTop: 0 }}>
-          <div className="wrap">
-            <div className="sec-head">
-              <div className="eyebrow">All countries</div>
-              <h2 style={{ fontSize: 24 }}>{region.label} — {countries.length} countries</h2>
-              {activeCount > 0 && <p>{activeCount} with active teams or events.</p>}
-            </div>
-            <div className="region-countries">
-              {countries.map((c) => (
-                <Link key={c.c} className="cc-card" href={`/${region.key}/${c.c.toLowerCase()}`}>
-                  <span className="flag"><Flag code={c.c} /></span>
-                  <span className="meta">
-                    <span className="cn">{c.n}</span>
-                    <span className="cc">{c.c} · {c.cur}</span>
-                  </span>
-                  {PRESENCE[c.c] && <span className="tag">{PRESENCE[c.c].teams} TEAMS</span>}
-                </Link>
-              ))}
-            </div>
           </div>
         </section>
 

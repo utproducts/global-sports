@@ -20,6 +20,8 @@ type EventRow = {
   max_teams: number | null;
 };
 type TeamRow = { name: string; city: string | null; current_class: string | null };
+type News = { id: string; title: string; type: string | null; country: string | null; location: string | null; image_url: string | null };
+const newsImg = (n: News) => n.image_url || `https://picsum.photos/seed/gsn-${n.id.slice(0, 8)}/720/480`;
 
 function fmtDate(d: string | null) {
   if (!d) return "TBD";
@@ -39,11 +41,11 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 async function getCountryData(code: string) {
-  const result = { events: [] as EventRow[], teams: [] as TeamRow[], teamCount: PRESENCE[code]?.teams ?? 0 };
+  const result = { events: [] as EventRow[], teams: [] as TeamRow[], teamCount: PRESENCE[code]?.teams ?? 0, news: [] as News[] };
   if (!supabase) return result;
   try {
     const { data: country } = await supabase.from("countries").select("id").eq("code", code).maybeSingle();
-    const [{ data: events }, teamsRes] = await Promise.all([
+    const [{ data: events }, teamsRes, { data: newsData }] = await Promise.all([
       supabase
         .from("tournament_summary")
         .select("slug,name,start_date,end_date,status,venue_city,registered_teams,max_teams")
@@ -56,8 +58,14 @@ async function getCountryData(code: string) {
             .eq("country_id", (country as { id: string }).id)
             .order("name", { ascending: true })
         : Promise.resolve({ data: null, count: null } as { data: TeamRow[] | null; count: number | null }),
+      supabase
+        .from("announcements")
+        .select("id,title,type,country,location,image_url")
+        .eq("status", "published").eq("country", code)
+        .order("published_at", { ascending: false }).limit(3),
     ]);
     if (events) result.events = events as EventRow[];
+    if (newsData) result.news = newsData as News[];
     if (teamsRes && "data" in teamsRes && teamsRes.data) {
       result.teams = teamsRes.data as TeamRow[];
       result.teamCount = (teamsRes as { count?: number | null }).count ?? result.teams.length;
@@ -79,7 +87,7 @@ export default async function CountryPage({
   if (!region || !entry || entry.region.key !== region.key) notFound();
 
   const c = entry.country;
-  const { events, teams, teamCount } = await getCountryData(c.c);
+  const { events, teams, teamCount, news } = await getCountryData(c.c);
 
   return (
     <>
@@ -107,7 +115,7 @@ export default async function CountryPage({
         {/* EVENTS */}
         <section className="pad">
           <div className="wrap">
-            <div className="sec-head"><div className="eyebrow">Events</div><h2>Tournaments in {c.n}</h2></div>
+            <div className="sec-head"><div className="eyebrow">Upcoming events</div><h2>Upcoming events in {c.n}</h2></div>
             {events.length === 0 ? (
               <p style={{ color: "var(--muted)" }}>No events scheduled yet — check back soon, or follow {region.label} for announcements.</p>
             ) : (
@@ -130,6 +138,28 @@ export default async function CountryPage({
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* NEWS */}
+        <section className="pad" style={{ paddingTop: 0 }}>
+          <div className="wrap">
+            <div className="sec-head"><div className="eyebrow">Latest</div><h2>News from {c.n}</h2></div>
+            {news.length === 0 ? (
+              <p style={{ color: "var(--muted)" }}>No news yet for {c.n}.</p>
+            ) : (
+              <div className="news-grid">
+                {news.map((n) => (
+                  <Link key={n.id} href="/events" className="news-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(10,22,40,.12), rgba(10,22,40,.9)), url('${newsImg(n)}')` }}>
+                    {n.country && <span className="news-flag"><Flag code={n.country} /></span>}
+                    <div className="news-body">
+                      <h3>{n.title}</h3>
+                      {n.location && <span className="news-loc">{n.location}</span>}
+                    </div>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
