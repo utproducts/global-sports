@@ -15,9 +15,14 @@ const AUD_HREFS = ["/players", "/teams", "/organizers", "/leagues"];
 const WHY_ICONS = ["🌍", "🏆", "📍", "💳"];
 const AUD_ICONS = ["🥎", "👥", "🗓️", "🏆"];
 
-type News = { id: string; title: string; body: string; published_at: string | null; type: string | null };
-type Ev = { name: string; start_date: string | null; country_code: string | null; status: string | null };
+type News = { id: string; title: string; type: string | null; country: string | null; location: string | null; image_url: string | null };
+type Ev = { slug: string | null; name: string; start_date: string | null; end_date: string | null; country_code: string | null; status: string | null; registered_teams: number | null; max_teams: number | null };
 const fmtD = (d: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
+const eventHref = (e: Ev) => {
+  const rk = e.country_code ? byCode[e.country_code]?.region.key : null;
+  return rk && e.slug ? `/${rk}/${e.country_code!.toLowerCase()}/events/${e.slug}` : "/events";
+};
+const newsImg = (n: News) => n.image_url || `https://picsum.photos/seed/gsn-${n.id.slice(0, 8)}/720/480`;
 
 export default function Home() {
   const { lang } = useI18n();
@@ -29,8 +34,8 @@ export default function Home() {
     (async () => {
       if (!supabase) return;
       const [{ data: a }, { data: e }] = await Promise.all([
-        supabase.from("announcements").select("id,title,body,published_at,type").eq("status", "published").order("pinned", { ascending: false }).order("published_at", { ascending: false }).limit(3),
-        supabase.from("tournament_summary").select("name,start_date,country_code,status").order("start_date", { ascending: true }).limit(4),
+        supabase.from("announcements").select("id,title,type,country,location,image_url").eq("status", "published").order("pinned", { ascending: false }).order("published_at", { ascending: false }).limit(3),
+        supabase.from("tournament_summary").select("slug,name,start_date,end_date,country_code,status,registered_teams,max_teams").order("start_date", { ascending: true }).limit(2),
       ]);
       setNews((a as News[]) ?? []);
       setEvents((e as Ev[]) ?? []);
@@ -63,41 +68,22 @@ export default function Home() {
           <div className="scroll-cue">{c.scroll}<span className="arrow">↓</span></div>
         </section>
 
-        {/* NEWS + FEATURED EVENTS */}
-        {(news.length > 0 || events.length > 0) && (
-          <section className="pad">
-            <div className="wrap home-two">
-              {news.length > 0 && (
-                <div>
-                  <div className="sec-head" style={{ marginBottom: 16 }}><div className="eyebrow">{c.newsEyebrow}</div><h2 style={{ fontSize: 24 }}>{c.newsTitle}</h2></div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {news.map((n) => (
-                      <div key={n.id} className="card" style={{ padding: 16 }}>
-                        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: .5, textTransform: "uppercase", color: "var(--gold)" }}>{n.type}</div>
-                        <h3 style={{ fontSize: 16, fontWeight: 800, margin: "4px 0" }}>{n.title}</h3>
-                        <p style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.5 }}>{n.body}</p>
-                        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>{fmtD(n.published_at)}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {events.length > 0 && (
-                <div>
-                  <div className="sec-head" style={{ marginBottom: 16 }}><div className="eyebrow">{c.eventsEyebrow}</div><h2 style={{ fontSize: 24 }}>{c.eventsTitle}</h2></div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {events.map((e, i) => (
-                      <Link key={i} href="/events" className="card" style={{ padding: 16, display: "flex", gap: 14, alignItems: "center", textDecoration: "none" }}>
-                        <div className="ev-card-date"><span className="d">{e.start_date ? new Date(e.start_date).getDate() : "–"}</span><span className="m">{e.start_date ? new Date(e.start_date).toLocaleDateString("en-GB", { month: "short" }) : ""}</span></div>
-                        <div><h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--navy)" }}>{e.name}</h3><p style={{ fontSize: 13, color: "var(--muted)" }}>{e.country_code && <Flag code={e.country_code} />} {fmtD(e.start_date)}</p></div>
-                      </Link>
-                    ))}
-                  </div>
-                  <Link className="btn btn-dark" href="/events" style={{ marginTop: 14 }}>{c.eventsCta}</Link>
-                </div>
-              )}
+        {/* FEATURED EVENTS BANNER */}
+        {events.length > 0 && (
+          <div className="wrap" style={{ marginTop: -46, position: "relative", zIndex: 3 }}>
+            <div className="feat-banner">
+              <div style={{ flex: "1 1 340px" }}>
+                <div className="feat-tag">★ {c.eventsTitle}</div>
+                {events.map((e, i) => (
+                  <Link key={i} href={eventHref(e)} style={{ display: "block", textDecoration: "none", marginTop: i ? 14 : 6 }}>
+                    <h2 style={{ color: "var(--navy)" }}>{e.name}</h2>
+                    <p>{e.country_code && <Flag code={e.country_code} />} {fmtD(e.start_date)}{e.end_date ? ` – ${fmtD(e.end_date)}` : ""}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p>
+                  </Link>
+                ))}
+              </div>
+              <Link className="btn btn-primary" href="/events" style={{ padding: "14px 26px" }}>{c.eventsCta}</Link>
             </div>
-          </section>
+          </div>
         )}
 
         {/* WHY */}
@@ -142,6 +128,26 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* LATEST NEWS */}
+        {news.length > 0 && (
+          <section className="pad" style={{ paddingTop: 0 }}>
+            <div className="wrap">
+              <div className="sec-head center"><div className="eyebrow">{c.newsEyebrow}</div><h2>{c.newsTitle}</h2></div>
+              <div className="news-grid">
+                {news.map((n) => (
+                  <Link key={n.id} href="/events" className="news-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(10,22,40,.12), rgba(10,22,40,.9)), url('${newsImg(n)}')` }}>
+                    {n.country && <span className="news-flag"><Flag code={n.country} /></span>}
+                    <div className="news-body">
+                      <h3>{n.title}</h3>
+                      {n.location && <span className="news-loc">{n.location}</span>}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* UMPIRE PROGRAM */}
         <section className="pad" style={{ paddingTop: 0 }}>
