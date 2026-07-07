@@ -9,13 +9,14 @@ import { supabase } from "@/lib/supabase";
 
 export const runtime = "edge";
 
-type Ev = { slug: string | null; name: string; start_date: string | null; country_code: string | null; status: string | null; registered_teams: number | null; max_teams: number | null };
-type News = { id: string; title: string; body: string; published_at: string | null; type: string | null };
+type Ev = { slug: string | null; name: string; start_date: string | null; end_date: string | null; country_code: string | null; status: string | null; registered_teams: number | null; max_teams: number | null };
+type News = { id: string; title: string; type: string | null; country: string | null; location: string | null; image_url: string | null };
 const fmtD = (d: string | null) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
 const eventHref = (e: Ev) => {
   const rk = e.country_code ? byCode[e.country_code]?.region.key : null;
   return rk && e.slug ? `/${rk}/${e.country_code!.toLowerCase()}/events/${e.slug}` : "/events";
 };
+const newsImg = (n: News) => n.image_url || `https://picsum.photos/seed/gsn-${n.id.slice(0, 8)}/720/480`;
 
 export default async function RegionPage({ params }: { params: Promise<{ region: string }> }) {
   const { region: regionKey } = await params;
@@ -57,18 +58,19 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
   let news: News[] = [];
   let usingGlobalEvents = false;
   if (supabase) {
-    const evSel = "slug,name,start_date,country_code,status,registered_teams,max_teams";
+    const evSel = "slug,name,start_date,end_date,country_code,status,registered_teams,max_teams";
+    const nSel = "id,title,type,country,location,image_url";
     const [{ data: evs }, { count }] = await Promise.all([
-      supabase.from("tournament_summary").select(evSel).in("country_code", codes).order("start_date", { ascending: true }).limit(4),
+      supabase.from("tournament_summary").select(evSel).in("country_code", codes).order("start_date", { ascending: true }).limit(2),
       supabase.from("tournament_summary").select("*", { count: "exact", head: true }).in("country_code", codes),
     ]);
     events = (evs as Ev[]) ?? [];
     tournamentCount = count ?? events.length;
 
-    const { data: rn } = await supabase.from("announcements").select("id,title,body,published_at,type").eq("status", "published").in("country", codes).order("published_at", { ascending: false }).limit(3);
+    const { data: rn } = await supabase.from("announcements").select(nSel).eq("status", "published").in("country", codes).order("published_at", { ascending: false }).limit(3);
     news = (rn as News[]) ?? [];
     if (news.length === 0) {
-      const { data: gn } = await supabase.from("announcements").select("id,title,body,published_at,type").eq("status", "published").is("country", null).order("pinned", { ascending: false }).order("published_at", { ascending: false }).limit(3);
+      const { data: gn } = await supabase.from("announcements").select(nSel).eq("status", "published").is("country", null).order("pinned", { ascending: false }).order("published_at", { ascending: false }).limit(3);
       news = (gn as News[]) ?? [];
     }
     if (events.length === 0) {
@@ -103,44 +105,53 @@ export default async function RegionPage({ params }: { params: Promise<{ region:
               <div className="card" style={{ textAlign: "center" }}><div style={{ fontSize: 32, fontWeight: 900 }}>{activeCount}</div><div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: .5, color: "var(--muted)" }}>Active countries</div></div>
             </div>
 
-            <div className="home-two" style={{ marginTop: 26 }}>
-              <div>
-                <div className="sec-head" style={{ marginBottom: 16 }}><div className="eyebrow">{usingGlobalEvents ? "Featured worldwide" : `In ${region.label}`}</div><h2 style={{ fontSize: 22 }}>Featured events</h2></div>
-                {events.length === 0 ? (
-                  <div className="card"><p style={{ color: "var(--muted)" }}>No events scheduled in {region.label} yet. Check back soon, or explore events across the world.</p><Link className="btn btn-dark" href="/events" style={{ marginTop: 12 }}>See all events →</Link></div>
-                ) : (
-                  <>
-                    {usingGlobalEvents && <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 10 }}>Nothing scheduled in {region.label} yet — here&apos;s what&apos;s happening worldwide.</p>}
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Featured events banner */}
+            <div style={{ marginTop: 26 }}>
+              {events.length === 0 ? (
+                <div className="feat-banner">
+                  <div style={{ flex: "1 1 340px" }}>
+                    <div className="feat-tag">★ Featured events</div>
+                    <h2 style={{ color: "var(--navy)" }}>Nothing scheduled in {region.label} yet</h2>
+                    <p>Check back soon, or explore events happening across the world.</p>
+                  </div>
+                  <Link className="btn btn-primary" href="/events" style={{ padding: "14px 26px" }}>See all events →</Link>
+                </div>
+              ) : (
+                <>
+                  <div className="feat-banner">
+                    <div style={{ flex: "1 1 340px" }}>
+                      <div className="feat-tag">★ {usingGlobalEvents ? "Featured worldwide" : `Featured in ${region.label}`}</div>
                       {events.map((e, i) => (
-                        <Link key={i} href={eventHref(e)} className="card" style={{ padding: 16, display: "flex", gap: 14, alignItems: "center", textDecoration: "none" }}>
-                          <div className="ev-card-date"><span className="d">{e.start_date ? new Date(e.start_date).getDate() : "–"}</span><span className="m">{e.start_date ? new Date(e.start_date).toLocaleDateString("en-GB", { month: "short" }) : ""}</span></div>
-                          <div><h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--navy)" }}>{e.name}</h3><p style={{ fontSize: 13, color: "var(--muted)" }}>{e.country_code && <Flag code={e.country_code} />} {fmtD(e.start_date)}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p></div>
+                        <Link key={i} href={eventHref(e)} style={{ display: "block", textDecoration: "none", marginTop: i ? 14 : 6 }}>
+                          <h2 style={{ color: "var(--navy)" }}>{e.name}</h2>
+                          <p>{e.country_code && <Flag code={e.country_code} />} {fmtD(e.start_date)}{e.end_date ? ` – ${fmtD(e.end_date)}` : ""}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p>
                         </Link>
                       ))}
                     </div>
-                    <Link className="btn btn-dark" href="/events" style={{ marginTop: 14 }}>See all events →</Link>
-                  </>
-                )}
-              </div>
-              <div>
-                <div className="sec-head" style={{ marginBottom: 16 }}><div className="eyebrow">Latest</div><h2 style={{ fontSize: 22 }}>News</h2></div>
-                {news.length === 0 ? (
-                  <div className="card"><p style={{ color: "var(--muted)" }}>No news yet for {region.label}.</p></div>
-                ) : (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {news.map((n) => (
-                      <div key={n.id} className="card" style={{ padding: 16 }}>
-                        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: .5, textTransform: "uppercase", color: "var(--gold)" }}>{n.type}</div>
-                        <h3 style={{ fontSize: 16, fontWeight: 800, margin: "4px 0" }}>{n.title}</h3>
-                        <p style={{ fontSize: 13.5, color: "var(--muted)", lineHeight: 1.5 }}>{n.body}</p>
-                        <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 6 }}>{fmtD(n.published_at)}</div>
-                      </div>
-                    ))}
+                    <Link className="btn btn-primary" href="/events" style={{ padding: "14px 26px" }}>See all events →</Link>
                   </div>
-                )}
-              </div>
+                  {usingGlobalEvents && <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 10 }}>Nothing scheduled in {region.label} yet — showing worldwide events.</p>}
+                </>
+              )}
             </div>
+
+            {/* Latest news photo cards */}
+            {news.length > 0 && (
+              <div style={{ marginTop: 42 }}>
+                <div className="sec-head center"><div className="eyebrow">Latest</div><h2>News</h2></div>
+                <div className="news-grid">
+                  {news.map((n) => (
+                    <Link key={n.id} href="/events" className="news-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(10,22,40,.12), rgba(10,22,40,.9)), url('${newsImg(n)}')` }}>
+                      {n.country && <span className="news-flag"><Flag code={n.country} /></span>}
+                      <div className="news-body">
+                        <h3>{n.title}</h3>
+                        {n.location && <span className="news-loc">{n.location}</span>}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
