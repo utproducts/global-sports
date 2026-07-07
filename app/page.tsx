@@ -68,20 +68,19 @@ export default function Home() {
           <div className="scroll-cue">{c.scroll}<span className="arrow">↓</span></div>
         </section>
 
-        {/* FEATURED EVENTS BANNER */}
+        {/* FEATURED EVENT BANNER — same UI as /events */}
         {events.length > 0 && (
           <div className="wrap" style={{ marginTop: -46, position: "relative", zIndex: 3 }}>
             <div className="feat-banner">
-              <div style={{ flex: "1 1 340px" }}>
-                <div className="feat-tag">★ {c.eventsTitle}</div>
-                {events.map((e, i) => (
-                  <Link key={i} href={eventHref(e)} style={{ display: "block", textDecoration: "none", marginTop: i ? 14 : 6 }}>
-                    <h2 style={{ color: "var(--navy)" }}>{e.name}</h2>
-                    <p>{e.country_code && <Flag code={e.country_code} />} {fmtD(e.start_date)}{e.end_date ? ` – ${fmtD(e.end_date)}` : ""}{e.registered_teams != null ? ` · ${e.registered_teams}${e.max_teams ? `/${e.max_teams}` : ""} teams` : ""}</p>
-                  </Link>
-                ))}
+              <div style={{ flex: "1 1 360px" }}>
+                <div className="feat-tag">★ Featured event</div>
+                <h2 style={{ color: "var(--navy)" }}>{events[0].name}</h2>
+                <p>{events[0].country_code && <Flag code={events[0].country_code} />} {fmtD(events[0].start_date)}{events[0].end_date ? ` – ${fmtD(events[0].end_date)}` : ""}{events[0].registered_teams != null ? ` · ${events[0].registered_teams}${events[0].max_teams ? `/${events[0].max_teams}` : ""} teams` : ""}</p>
               </div>
-              <Link className="btn btn-primary" href="/events" style={{ padding: "14px 26px" }}>{c.eventsCta}</Link>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <Link className="btn btn-primary" href={events[0].status === "registration_open" ? `${eventHref(events[0])}/register` : eventHref(events[0])} style={{ padding: "14px 26px" }}>{events[0].status === "registration_open" ? "Register now →" : "View event →"}</Link>
+                <Link className="btn btn-dark" href="/events" style={{ padding: "14px 22px" }}>{c.eventsCta}</Link>
+              </div>
             </div>
           </div>
         )}
