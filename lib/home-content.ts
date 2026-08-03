@@ -40,7 +40,7 @@ const en: HomeCopy = {
   howEyebrow: "How it works", howH2: "From sign-up to first pitch in three steps.",
   steps: [
     { h: "Pick your country", p: "Select where you play. We route you to your country's home, set up in your language and currency." },
-    { h: "Create your membership", p: "One required Global Sports membership unlocks events everywhere. Choose Standard, Select or Elite." },
+    { h: "Create your membership", p: "One required Global Sports membership unlocks events everywhere. Choose League or Tournament." },
     { h: "Join a team & register", p: "Get added to a roster, register for tournaments, and start chasing the title." },
   ],
   memEyebrow: "Membership", memH2: "One membership. Valid everywhere.",
@@ -84,7 +84,7 @@ const es: HomeCopy = {
   howEyebrow: "Cómo funciona", howH2: "Del registro al primer lanzamiento en tres pasos.",
   steps: [
     { h: "Elige tu país", p: "Selecciona dónde juegas. Te llevamos a la casa de tu país, configurada en tu idioma y moneda." },
-    { h: "Crea tu membresía", p: "Una membresía obligatoria de Global Sports desbloquea eventos en todas partes. Elige Standard, Select o Elite." },
+    { h: "Crea tu membresía", p: "Una membresía obligatoria de Global Sports desbloquea eventos en todas partes. Elige Liga o Torneo." },
     { h: "Únete a un equipo y regístrate", p: "Únete a un róster, regístrate en torneos y empieza a perseguir el título." },
   ],
   memEyebrow: "Membresía", memH2: "Una membresía. Válida en todas partes.",
@@ -128,7 +128,7 @@ const it: HomeCopy = {
   howEyebrow: "Come funziona", howH2: "Dall'iscrizione al primo lancio in tre passi.",
   steps: [
     { h: "Scegli il tuo paese", p: "Seleziona dove giochi. Ti portiamo alla casa del tuo paese, configurata nella tua lingua e valuta." },
-    { h: "Crea la tua iscrizione", p: "Un'iscrizione Global Sports obbligatoria sblocca gli eventi ovunque. Scegli Standard, Select o Elite." },
+    { h: "Crea la tua iscrizione", p: "Un'iscrizione Global Sports obbligatoria sblocca gli eventi ovunque. Scegli Campionato o Torneo." },
     { h: "Unisciti a una squadra e iscriviti", p: "Entra in un roster, iscriviti ai tornei e inizia a inseguire il titolo." },
   ],
   memEyebrow: "Iscrizione", memH2: "Un'iscrizione. Valida ovunque.",
@@ -172,7 +172,7 @@ const de: HomeCopy = {
   howEyebrow: "So funktioniert's", howH2: "Von der Anmeldung zum ersten Pitch in drei Schritten.",
   steps: [
     { h: "Wähle dein Land", p: "Wähle, wo du spielst. Wir leiten dich zum Zuhause deines Landes, eingerichtet in deiner Sprache und Währung." },
-    { h: "Erstelle deine Mitgliedschaft", p: "Eine erforderliche Global-Sports-Mitgliedschaft schaltet Events überall frei. Wähle Standard, Select oder Elite." },
+    { h: "Erstelle deine Mitgliedschaft", p: "Eine erforderliche Global-Sports-Mitgliedschaft schaltet Events überall frei. Wähle Liga oder Turnier." },
     { h: "Tritt einem Team bei & melde dich an", p: "Lass dich einem Kader hinzufügen, melde dich für Turniere an und jage den Titel." },
   ],
   memEyebrow: "Mitgliedschaft", memH2: "Eine Mitgliedschaft. Überall gültig.",
